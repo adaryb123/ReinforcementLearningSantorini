@@ -65,8 +65,8 @@ class Board:
             row, col = self.white2
 
         currentLevel = self.tiles[row][col].level
-        toCoordsList = [(row, col - 1), (row, col + 1), (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
-                        (row + 1, col - 1), (row + 1, col), (row + 1, col + 1)]
+        # clockwise
+        toCoordsList = [(row-1,col), (row-1,col+1), (row,col+1), (row+1,col+1), (row+1,col), (row+1,col-1), (row,col-1), (row-1,col-1)]
         for i, j in toCoordsList:
             if self.check_valid_for_move(i, j, currentLevel):
                 moves.extend(self.add_all_builds((row, col), (i, j), player))
@@ -84,7 +84,8 @@ class Board:
         moves = []
         row, col = toCoords
         moves.append(Move(fromCoords, toCoords, fromCoords, player))   # always can build on the tile from were it came
-        buildCoordsList = [(row,col-1), (row,col+1), (row-1,col-1), (row-1,col), (row-1,col+1), (row+1,col-1), (row+1, col), (row+1,col+1)]
+        # clockwise
+        buildCoordsList = [(row-1,col), (row-1,col+1), (row,col+1), (row+1,col+1), (row+1,col), (row+1,col-1), (row,col-1), (row-1,col-1)]
         for i, j in buildCoordsList:
             if self.check_valid_for_build(i, j):
                 moves.append(Move(fromCoords, toCoords, (i, j), player))
