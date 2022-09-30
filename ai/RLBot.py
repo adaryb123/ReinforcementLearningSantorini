@@ -9,8 +9,16 @@ class RLBot:
     def make_turn(self, board, availableMoves):
         return availableMoves[0]
 
-    def encode_input(self):
-        return True
+    def encode_input(self, board):
+        input = []
+        for i in board.tiles:
+            for j in i:
+                input.append((j.level,j.player))
+                # toto si niesom isty
+                # if self.color == "white":
+                    #input.append((j.level), -j.player))
+
+        return input
 
     def decode_output(self, output, board):
         row1 = 0
@@ -18,8 +26,6 @@ class RLBot:
         row2 = 0
         col2 = 0
         moves = []
-        coordsList = []
-        coordsList2 = []
         if self.color == "black":
             row1, col1 = board.black1
             row2, col2 = board.black2
@@ -27,20 +33,12 @@ class RLBot:
             row1, col1 = board.white1
             row2, col2 = board.white2
 
-        # # clockwise
-        # coordsList = [(row1 - 1, col1), (row1 - 1, col1 + 1), (row1, col1 + 1), (row1 + 1, col1 + 1), (row1 + 1, col1),
-        #               (row1 + 1, col1 - 1), (row1, col1 - 1), (row1 - 1, col1 - 1)]
-        # coordsList2 = [(row2 - 1, col2), (row2 - 1, col2 + 1), (row2, col2 + 1), (row2 + 1, col2 + 1), (row2 + 1, col2),
-        #               (row2 + 1, col2 - 1), (row2, col2 - 1), (row2 - 1, col2 - 1)]
+        fromCoords = ()
         toCoordsList = []
         buildCoordsList = []
         offset = 0
 
         for i in range(output):
-            fromCoords = ()
-            toCoords = ()
-            buildCoords = ()
-
             if i == 0:
                 offset = 0
                 fromCoords = (row1, col1)
@@ -57,10 +55,31 @@ class RLBot:
                 buildCoordsList = self.make_clockwise_list(row_to, col_to)
             buildCoords = buildCoordsList[int(i % 8)]
 
-            moves.append(Move(fromCoords,toCoords,buildCoords,self.color))
             # teraz sa zahodia neplatnne tahy, vektor sa znormalizuje a vyberie sa najlepsi (epsilon nieco) tah
+            potential_move = Move(fromCoords,toCoords,buildCoords,self.color)
+            if self.check_move_valid(potential_move,board):
+                moves.append(potential_move)
+            else:
+                output[i] = 0
+
+
 
     def make_clockwise_list(self,row, col):
         coordsList = [(row1 - 1, col1), (row1 - 1, col1 + 1), (row1, col1 + 1), (row1 + 1, col1 + 1),
                       (row1 + 1, col1), (row1 + 1, col1 - 1), (row1, col1 - 1), (row1 - 1, col1 - 1)]
         return coordsList
+
+    def check_move_valid(self, move, board):
+        row_from, col_from = move.fromCoords
+        row_to, col_to = move.toCoords
+        row_build, col_build = move.buildCoords
+        current_tile = board.tiles[row_from][col_from]
+        move_target = board.tiles[row_to][col_to]
+        build_target = board.tiles[row_build][col_build]
+
+        if 0 <= row_to < 5 and 0 <= col_to < 5 and 0 <= row_build < 5 and 0 <= col_build < 5:
+            if move_target.player == 0 and build_target.player == 0:
+                if move_target.level != 4 and build_target.level != 4:
+                    if move_target.level <= current_tile.level + 1:
+                        return True
+        return False

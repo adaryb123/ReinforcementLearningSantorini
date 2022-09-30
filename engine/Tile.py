@@ -1,6 +1,6 @@
 class Tile:
     def __init__(self):
-        self.level = 0
+        self.level = 0      # 4 means dome
         self.player = 0     # 0 means empty, -1 means black, 1 means white
 
     def __str__(self):
