@@ -7,16 +7,16 @@ class RLBot:
         self.color = color
 
     def make_turn(self, board, availableMoves):
-        return availableMoves[0]
+        pass
 
     def encode_input(self, board):
         input = []
         for i in board.tiles:
             for j in i:
-                input.append((j.level,j.player))
-                # toto si niesom isty
-                # if self.color == "white":
-                    #input.append((j.level), -j.player))
+                if self.color == "black":
+                    input.append([j.level, - j.player])
+                elif self.color == "white":
+                    input.append([j.level, j.player])
 
         return input
 
