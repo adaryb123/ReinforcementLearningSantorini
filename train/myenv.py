@@ -13,7 +13,7 @@ class MyEnv(gym.Env):
     def __init__(self):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
-        self.observation_space = spaces.Box(low=0, high=255, shape=(5, 5, 2))
+        self.observation_space = spaces.Box(low=-1, high=5, shape=(5, 5, 2), dtype=int)
 
         # self.observation_space = spaces.Box(low=-500, high=500)
         self.board = Board()
@@ -53,7 +53,8 @@ class MyEnv(gym.Env):
             for j in i:
                 if self.color == "black":
                     row.append([j.level, - j.player])
-                elif self.color == "white":                   # WTF
+                # elif self.color == "white":                   # WTF
+                else:
                     row.append([j.level, j.player])
             inputTensor.append(row)
 
@@ -61,50 +62,6 @@ class MyEnv(gym.Env):
 
     def render(self):
         print(self.board.__str__())
-
-  # def decode_output(self, output, board):
-  #       row1 = 0
-  #       col1 = 0
-  #       row2 = 0
-  #       col2 = 0
-  #       moves = []
-  #       if self.color == "black":
-  #           row1, col1 = board.black1
-  #           row2, col2 = board.black2
-  #       else:
-  #           row1, col1 = board.white1
-  #           row2, col2 = board.white2
-  #
-  #       fromCoords = ()
-  #       toCoordsList = []
-  #       buildCoordsList = []
-  #       offset = 0
-  #
-  #       for i in range(output):
-  #           if i == 0:
-  #               offset = 0
-  #               fromCoords = (row1, col1)
-  #               toCoordsList = self.make_clockwise_list(row1,col1)
-  #           elif i == 64:
-  #               offset = 64
-  #               fromCoords = (row2, col2)
-  #               toCoordsList = self.make_clockwise_list(row2, col2)
-  #           index = i - offset
-  #           toCoords = toCoordsList[int(index / 8)]
-  #
-  #           if i % 8 == 0:
-  #               row_to, col_to = toCoords
-  #               buildCoordsList = self.make_clockwise_list(row_to, col_to)
-  #           buildCoords = buildCoordsList[int(i % 8)]
-  #
-  #           # teraz sa zahodia neplatnne tahy, vektor sa znormalizuje a vyberie sa najlepsi (epsilon nieco) tah
-  #           potential_move = Move(fromCoords,toCoords,buildCoords,self.color)
-  #           if self.check_move_valid(potential_move,board):
-  #               moves.append(potential_move)
-  #           else:
-  #               output[i] = 0
-
-
 
     def make_clockwise_list(self,row1, col1):
         coordsList = [(row1 - 1, col1), (row1 - 1, col1 + 1), (row1, col1 + 1), (row1 + 1, col1 + 1),
@@ -150,4 +107,48 @@ class MyEnv(gym.Env):
         build_row, build_col = buildCoordsList[int(number % 8)]
 
         return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), "white")
+
+
+
+  # def decode_output(self, output, board):
+  #       row1 = 0
+  #       col1 = 0
+  #       row2 = 0
+  #       col2 = 0
+  #       moves = []
+  #       if self.color == "black":
+  #           row1, col1 = board.black1
+  #           row2, col2 = board.black2
+  #       else:
+  #           row1, col1 = board.white1
+  #           row2, col2 = board.white2
+  #
+  #       fromCoords = ()
+  #       toCoordsList = []
+  #       buildCoordsList = []
+  #       offset = 0
+  #
+  #       for i in range(output):
+  #           if i == 0:
+  #               offset = 0
+  #               fromCoords = (row1, col1)
+  #               toCoordsList = self.make_clockwise_list(row1,col1)
+  #           elif i == 64:
+  #               offset = 64
+  #               fromCoords = (row2, col2)
+  #               toCoordsList = self.make_clockwise_list(row2, col2)
+  #           index = i - offset
+  #           toCoords = toCoordsList[int(index / 8)]
+  #
+  #           if i % 8 == 0:
+  #               row_to, col_to = toCoords
+  #               buildCoordsList = self.make_clockwise_list(row_to, col_to)
+  #           buildCoords = buildCoordsList[int(i % 8)]
+  #
+  #           # teraz sa zahodia neplatnne tahy, vektor sa znormalizuje a vyberie sa najlepsi (epsilon nieco) tah
+  #           potential_move = Move(fromCoords,toCoords,buildCoords,self.color)
+  #           if self.check_move_valid(potential_move,board):
+  #               moves.append(potential_move)
+  #           else:
+  #               output[i] = 0
 
