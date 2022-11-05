@@ -11,13 +11,13 @@ class Board:
         self.black1, self.black2, self.white1, self.white2 = self.setup_players()
 
     def __str__(self):
-        output = "    |   A   |   B   |   C   |   D   |   E   |\n"
-        output += "____|_______|_______|_______|_______|_______|\n"
+        output = "                |   A   |   B   |   C   |   D   |   E   |\n"
+        output += "            ____|_______|_______|_______|_______|_______|\n"
         for i in range(5):
-            output += str(i+1) + "  "
+            output += "            " + str(i+1) + "  "
             for j in range(5):
                 output += " | " + self.tiles[i][j].__str__()
-            output += " |\n____|_______|_______|_______|_______|_______|\n"
+            output += " |\n            ____|_______|_______|_______|_______|_______|\n"
         return output
 
     def setup_players(self):

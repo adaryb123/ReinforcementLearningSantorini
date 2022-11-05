@@ -1,24 +1,33 @@
 import gym
 from gym import spaces
 import numpy as np
-import cv2
-import random
-import time
-from collections import deque
 from engine.Board import Board
 from engine.Move import Move
+
+# file is modified and probably wont work, use old myenv from github
 
 class MyEnv(gym.Env):
 
     def __init__(self):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
-        self.observation_space = spaces.Box(low=-1, high=5, shape=(5, 5, 2), dtype=int)
+        self.observation_space = spaces.Box(low=-1, high=5, shape=(2, 5, 5), dtype=int)
 
         # self.observation_space = spaces.Box(low=-500, high=500)
         self.board = Board()
-        self.color = "white"
+        self.players_turn = "white"
         self.prev_actions = []
+
+        self.logoutput = False
+
+    def setlogoutput(self, new):
+        self.logoutput = new
+
+    def set_next_player(self):
+        if self.players_turn == "white":
+            self.players_turn = "black"
+        else:
+            self.players_turn = "white"
 
     def step(self, action):
         # print(action)
@@ -26,37 +35,50 @@ class MyEnv(gym.Env):
         # print(chosenMove)
         valid,log = self.check_move_valid(chosenMove,self.board)
         if not valid:
-            print("---------------------------------------------------------------invalid move: " + log)
+            if self.logoutput == True:
+                print("---------------------------------------------------------------invalid move: " + log)
             return self.encode_input(self.board), -10, 1, {}
         else:
             self.prev_actions.append(chosenMove)
             self.board.update_board_after_move(chosenMove)
-            end, _ = self.board.check_if_game_ended("white")
+            end, _ = self.board.check_if_game_ended(self.players_turn)
             if end:
-                print("---------------------------------------------------------------win")
+                if self.logoutput == True:
+                    print("---------------------------------------------------------------win")
                 return self.encode_input(self.board), 1, 1, {}
             else:
-                print("---------------------------------------------------------------good move")
+                self.set_next_player()
+                if self.logoutput == True:
+                    print("---------------------------------------------------------------good move")
                 return self.encode_input(self.board), 0, 0, {}
 
 
     def reset(self):
         self.board = Board()
         self.prev_actions = []
+        self.players_turn = "white"
         return np.array(self.encode_input(self.board))
 
 
     def encode_input(self, board):
         inputTensor = []
+        board_heigths = []
         for i in board.tiles:
             row = []
             for j in i:
-                if self.color == "black":
-                    row.append([j.level, - j.player])
-                # elif self.color == "white":                   # WTF
+                row.append(j.level)
+            board_heigths.append(row)
+        inputTensor.append(board_heigths)
+        board_players = []
+        for i in board.tiles:
+            row = []
+            for j in i:
+                if self.players_turn == "white":
+                    row.append(j.player)
                 else:
-                    row.append([j.level, j.player])
-            inputTensor.append(row)
+                    row.append(-j.player)
+            board_players.append(row)
+        inputTensor.append(board_players)
 
         return inputTensor
 
@@ -96,9 +118,15 @@ class MyEnv(gym.Env):
 
     def create_move(self,number):
         if number < 64:
-            from_row, from_col = self.board.white1
+            if self.players_turn == "white":
+                from_row, from_col = self.board.white1
+            else:
+                from_row, from_col = self.board.black1
         else:
-            from_row, from_col = self.board.white2
+            if self.players_turn == "white":
+                from_row, from_col = self.board.white2
+            else:
+                from_row, from_col = self.board.black2
             number -= 64
 
         toCoordsList = self.make_clockwise_list(from_row, from_col)
@@ -106,7 +134,7 @@ class MyEnv(gym.Env):
         buildCoordsList = self.make_clockwise_list(to_row, to_col)
         build_row, build_col = buildCoordsList[int(number % 8)]
 
-        return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), "white")
+        return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), self.players_turn)
 
 
 

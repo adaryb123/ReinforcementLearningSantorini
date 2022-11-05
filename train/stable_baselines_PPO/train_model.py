@@ -6,7 +6,7 @@ import time
 # models_dir = f"models/{int(time.time())}/"
 # logdir = f"logs/{int(time.time())}/"
 
-models_dir = "models/PPO-2"
+models_dir = "../models/PPO-2"
 logdir = "logs/PPO-2"
 
 

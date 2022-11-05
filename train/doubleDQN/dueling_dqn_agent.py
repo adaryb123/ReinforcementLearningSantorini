@@ -51,7 +51,7 @@ class DuelingDQNAgent(object):
     def choose_action(self, observation):
         if np.random.random() > self.epsilon:
             state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
-            _, advantage = self.q_eval.forward(state)
+            _, advantage = self.q_eval.forward(state)     #tu by sa dali osetrovat nemozne tahy
             action = T.argmax(advantage).item()
         else:
             action = np.random.choice(self.action_space)
@@ -78,14 +78,17 @@ class DuelingDQNAgent(object):
         states, actions, rewards, states_, dones = self.sample_memory()
 
         V_s, A_s = self.q_eval.forward(states)
+
+        states_ = self.flip_tensor_values(states_)
+
         V_s_, A_s_ = self.q_next.forward(states_)
 
         indices = np.arange(self.batch_size)
 
         q_pred = T.add(V_s,
-                        (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]
+                        (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]        # ja mozem hrat nahodne
         q_next = T.add(V_s_,
-                        (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]
+                        (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]          #super predpokladame ze hra optimalne
 
         q_next[dones] = 0.0
         q_target = rewards + self.gamma*q_next
@@ -98,6 +101,16 @@ class DuelingDQNAgent(object):
 
         self.decrement_epsilon()
 
+    def flip_tensor_values(self, states_):
+        for i in range(len(states_)):
+            for j in range(len(states_[i])):
+                if j == 1:
+                    for k in range(len(states_[i][j])):
+                        for m in range(len(states_[i][j][k])):
+                            if states_[i][j][k][m].item() != 0:
+                                states_[i][j][k][m] = T.tensor(- states_[i][j][k][m].item())
+
+        return states_
     def save_models(self):
         self.q_eval.save_checkpoint()
         self.q_next.save_checkpoint()
