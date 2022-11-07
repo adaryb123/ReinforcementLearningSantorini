@@ -59,8 +59,8 @@ def main():
         best_score = -np.inf
         n_episodes = 10
         agent = DuelingDQNAgent(gamma=0.99, epsilon=1.0, lr=0.0001,
-                                input_dims=(env.observation_space.shape),
-                                n_actions=env.action_space.n, mem_size=50000, eps_min=0.1,
+                                input_dims=env.observation_space.shape,
+                                n_actions=env.action_space.n, mem_size=50000, eps_min=0.01,
                                 batch_size=32, replace=10000, eps_dec=1e-5,
                                 chkpt_dir='models/', algo='DuelingDQNAgent_' + str(seed),
                                 env_name='Santorini')
