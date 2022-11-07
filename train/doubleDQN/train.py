@@ -11,8 +11,13 @@ import random
 # load = False
 
 # if continuing on an already trained model
-seed = 71846
+seed = 35995
 load = True
+
+n_episodes = 1000
+epsilon = 0
+eps_min = 0
+
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -57,10 +62,10 @@ def main():
         env = MyEnv()
         env.reset()
         best_score = -np.inf
-        n_episodes = 10
-        agent = DuelingDQNAgent(gamma=0.99, epsilon=1.0, lr=0.0001,
+
+        agent = DuelingDQNAgent(gamma=0.99, epsilon=epsilon, lr=0.0001,
                                 input_dims=env.observation_space.shape,
-                                n_actions=env.action_space.n, mem_size=50000, eps_min=0.01,
+                                n_actions=env.action_space.n, mem_size=50000, eps_min=eps_min,
                                 batch_size=32, replace=10000, eps_dec=1e-5,
                                 chkpt_dir='models/', algo='DuelingDQNAgent_' + str(seed),
                                 env_name='Santorini')
@@ -72,44 +77,54 @@ def main():
 
         total_steps = 0
         scores, eps_history, steps_array = [], [], []
+        average_score_temp = 0
 
-        for i in range(n_episodes+1):
+        for i in range(1, n_episodes+1):
             done = False
             observation = env.reset()
-            logfile.write("start episode "+str(i) + "\n")
-            logfile.write(env.render())
+
+            if i % 100 == 0:
+                logfile.write("start episode " + str(i) + " of " + str(n_episodes) + "\n")
+                logfile.write(env.render())
 
             episode_steps = 0
-            score = 0
+            episode_score = 0
             while not done:
                 action = agent.choose_action(observation)
                 observation_, reward, done, info = env.step(action)
 
-                score += reward
-                action_log = "------------player: " + info.get("player") + " move: " + info.get("move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
-                logfile.write(action_log)
-                logfile.write(env.render())
+                episode_score += reward
+
+                if i % 100 == 0:
+                    action_log = "------------player: " + info.get("player") + " move: " + info.get("move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
+                    logfile.write(action_log)
+                    logfile.write(env.render())
 
                 agent.store_transition(observation, action, reward, observation_, int(done))
                 agent.learn()
                 observation = observation_
                 episode_steps += 1
 
-            episode_log  = 'end episode: ' + str(i) + ' score: ' +str(score)  + str(' best score %.2f ' % best_score) + str(' epsilon %.2f ' % agent.epsilon) + ' steps ' + str(episode_steps) + "\n"
-            logfile.write(episode_log)
-
-            if score > best_score:
-                best_score = score
+            if episode_score > best_score:
+                best_score = episode_score
 
             agent.save_models()
 
-            scores.append(score)
             total_steps += episode_steps
-            steps_array.append(total_steps)
-            eps_history.append(agent.epsilon)
+            average_score_temp += episode_score
 
             if i % 100 == 0:
+                average_score = average_score_temp / 100
+                scores.append(average_score)
+                steps_array.append(total_steps)
+                eps_history.append(agent.epsilon)
+                episode_log = 'end episode: ' + str(i) + ' score: ' + str(episode_score) + str(
+                    ' best score %.2f ' % best_score) + str(
+                    ' average score %.2f ' % average_score)+ str(' epsilon %.2f ' % agent.epsilon) + ' steps ' + str(
+                    episode_steps) + "\n"
+                logfile.write(episode_log)
                 print("episode " + str(i) + " of " + str(n_episodes))
+                average_score_temp = 0
 
         print("done")
         x = [i+1 for i in range(len(scores))]
