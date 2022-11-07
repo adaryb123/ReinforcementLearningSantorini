@@ -50,7 +50,7 @@ class DuelingDQNAgent(object):
 
     def choose_action(self, observation):
         if np.random.random() > self.epsilon:
-            state = T.tensor([observation],dtype=T.float).to(self.q_eval.device)
+            state = T.tensor(np.array[observation],dtype=T.float).to(self.q_eval.device)
             _, advantage = self.q_eval.forward(state)     #tu by sa dali osetrovat nemozne tahy
             action = T.argmax(advantage).item()
         else:
@@ -92,7 +92,6 @@ class DuelingDQNAgent(object):
 
         q_next[dones] = 0.0
         q_target = rewards + self.gamma*q_next
-
 
         loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
         loss.backward()

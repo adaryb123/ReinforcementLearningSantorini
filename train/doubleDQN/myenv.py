@@ -37,7 +37,7 @@ class MyEnv(gym.Env):
             self.board.update_board_after_move(chosenMove)
             end, _ = self.board.check_if_game_ended(self.players_turn)
             if end:
-                return self.encode_input(self.board), 10000, 1, {"move": chosenMove.__str__(), "player": self.players_turn,  "valid": "WIN", "win": True, "message": ""}
+                return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(), "player": self.players_turn,  "valid": "WIN", "win": True, "message": ""}
             else:
                 self.set_next_player()
                 return self.encode_input(self.board), 1, 0, {"move": chosenMove.__str__(), "player": self.get_prev_player(),  "valid": "VALID", "win": False, "message": ""}
