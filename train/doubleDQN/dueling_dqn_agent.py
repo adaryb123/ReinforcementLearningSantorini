@@ -2,6 +2,7 @@ import numpy as np
 import torch as T
 from deep_q_network import DuelingDeepQNetwork
 from replay_memory import ReplayBuffer
+from line_profiler_pycharm import profile
 
 class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
@@ -70,48 +71,46 @@ class DuelingDQNAgent(object):
         self.epsilon = self.epsilon - self.eps_dec \
                          if self.epsilon > self.eps_min else self.eps_min
 
+
+    # @profile
     def learn(self):
-        if self.memory.mem_cntr < self.batch_size:
+        if self.memory.mem_cntr < self.batch_size:          # mem cntr iba na zaciatku
             return
 
-        self.q_eval.optimizer.zero_grad()
+        for i in range(30):
 
-        self.replace_target_network()
+            self.q_eval.optimizer.zero_grad()
 
-        states, actions, rewards, states_, dones = self.sample_memory()
+            self.replace_target_network()
 
-        V_s, A_s = self.q_eval.forward(states)
+            states, actions, rewards, states_, dones = self.sample_memory()
 
-        states_ = self.flip_tensor_values(states_)
+            V_s, A_s = self.q_eval.forward(states)
 
-        V_s_, A_s_ = self.q_next.forward(states_)
+            states_ = self.flip_tensor_values(states_)
 
-        indices = np.arange(self.batch_size)
+            V_s_, A_s_ = self.q_next.forward(states_)
 
-        q_pred = T.add(V_s,
-                        (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]        # ja mozem hrat nahodne
-        q_next = T.add(V_s_,
-                        (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]          #super predpokladame ze hra optimalne
+            indices = T.arange(self.batch_size)
 
-        q_next[dones] = 0.0
-        q_target = rewards + self.gamma*q_next
+            q_pred = T.add(V_s,
+                            (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]        # ja mozem hrat nahodne
+            q_next = T.add(V_s_,
+                            (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]          #super predpokladame ze hra optimalne
 
-        loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
-        loss.backward()
-        self.q_eval.optimizer.step()
-        self.learn_step_counter += 1
+            q_next[dones] = 0.0
+            q_target = rewards + self.gamma*q_next
 
-        self.decrement_epsilon()
+            loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
+            loss.backward()         #96 percent casu travi tu
+            self.q_eval.optimizer.step()
+            self.learn_step_counter += 1
+
+            self.decrement_epsilon()
+
 
     def flip_tensor_values(self, states_):
-        for i in range(len(states_)):
-            for j in range(len(states_[i])):
-                if j == 1:
-                    for k in range(len(states_[i][j])):
-                        for m in range(len(states_[i][j][k])):
-                            if states_[i][j][k][m].item() != 0:
-                                states_[i][j][k][m] = T.tensor(- states_[i][j][k][m].item())
-
+        states_[:,1,:,:] *= -1
         return states_
     def save_models(self):
         self.q_eval.save_checkpoint()
