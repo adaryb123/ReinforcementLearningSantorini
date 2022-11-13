@@ -42,8 +42,6 @@ def setup_output_files_directories():
 def plot_learning_curve(x, scores, epsilons, steps, filename):
     fig = plt.figure()
     ax = fig.add_subplot(111, label="1")
-    # ax2 = fig.add_subplot(111, label="2")
-    # ax3 = fig.add_subplot(111, label="3")
 
     ax.plot(x, epsilons, color="C0")
     ax.set_xlabel("Episode", color="C0")
@@ -56,13 +54,9 @@ def plot_learning_curve(x, scores, epsilons, steps, filename):
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(111, label="2")
-    # ax2.scatter(x, scores, color="C1")
     ax2.plot(x, scores, color="C1")
-    # ax2.axes.get_xaxis().set_visible(False)
-    # ax2.yaxis.tick_right()
     ax2.set_xlabel("Episode", color="C1")
-    ax2.set_ylabel('Score', color="C1")
-    # ax2.yaxis.set_label_position('right')
+    ax2.set_ylabel('Average steps', color="C1")
     ax2.tick_params(axis='x', colors="C1")
     ax2.tick_params(axis='y', colors="C1")
 
@@ -73,21 +67,13 @@ def plot_learning_curve(x, scores, epsilons, steps, filename):
     ax3 = fig3.add_subplot(111, label="2")
 
     ax3.scatter(x, steps, color="C2")
-    # ax3.axes.get_xaxis().set_visible(False)
-    # ax3.yaxis.tick_right()
     ax3.set_xlabel("Episode", color="C2")
-    ax3.set_ylabel('Score', color="C2")
-    # ax3.yaxis.set_label_position('right')
+    ax3.set_ylabel('Average score', color="C2")
     ax3.tick_params(axis='x', colors="C2")
     ax3.tick_params(axis='y', colors="C2")
 
     plt.savefig(filename + "_2" + '.png')
     plt.close(fig3)
-
-    # if lines is not None:
-    #     for line in lines:
-    #         plt.axvline(x=line)
-
 
 # @profile
 def main():  # vypisovat cas epizody/ epizod
@@ -135,7 +121,7 @@ def main():  # vypisovat cas epizody/ epizod
                 episode_score += reward
                 agent.store_transition(observation, action, reward, observation_, int(done))
                 if i % learn_frequency == 0:
-                    agent.learn()  # skusit iba kazdych 100 epizod ale viackrat
+                    agent.learn()
                 observation = observation_
                 episode_steps += 1
 
@@ -155,8 +141,6 @@ def main():  # vypisovat cas epizody/ epizod
 
             total_steps += episode_steps
             total_score += episode_score
-            # average_score_temp += episode_score
-            # average_score_plot += episode_score
 
             if i % log_every == 0:
                 average_score = total_score / log_every
@@ -167,9 +151,6 @@ def main():  # vypisovat cas epizody/ epizod
                 episode_log = "episode: " + str(i) + "/" + str(n_episodes) + " score: " + str(episode_score) + " best score: " + str(best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(agent.epsilon) + "\n   steps: " + str(episode_steps) + " average steps: " + str(average_steps) + " elapsed time: " + str(elapsed_time) + " win count: " + str(win_count) + "\n"
                 logfile.write(episode_log)
                 print(episode_log)
-                # elapsed_time = datetime.now() - last_timestamp
-                # last_timestamp = datetime.now()
-                # print("episode " + str(i) + " of " + str(n_episodes) + " elapsed: " + str(elapsed_time) + " win count: " + str(win_count))
 
                 scores.append(average_score)
                 steps_array.append(average_steps)
@@ -185,8 +166,6 @@ def main():  # vypisovat cas epizody/ epizod
         end_log = "end: " + " seed: " + str(seed) + " timestamp " + str(end_timestamp) + " , training time: " + str(end_elapsed_time)
         logfile.write(end_log)
         print(end_log)
-        # plot_learning_curve(steps_array, scores, eps_history, figure_file)
-        # plot_learning_curve(episodes_num, scores, eps_history, steps_array, figure_file)
 
 setup_output_files_directories()
 main()
