@@ -12,16 +12,16 @@ from line_profiler_pycharm import profile
 # load = False
 
 # if continuing on an already trained model
-seed = 10225
+seed = 72888
 load = True
 
-n_episodes = 75000
-epsilon = 0.17
+n_episodes = 500000
+epsilon = 0.75
 eps_min = 0.01
-log_every = 1000
-# plot_every = 1000
-learn_frequency = 100
-reward_for_win = 1
+log_every = 5000
+learn_frequency = 1000
+batch_learn_size = 30
+reward_for_win = 10
 
 
 def setup_output_files_directories():
@@ -39,16 +39,14 @@ def setup_output_files_directories():
         os.makedirs(plots_dir)
 
 
-def plot_learning_curve(x, scores, epsilons, steps, filename):
+def plot_learning_curve(x, scores, epsilons, steps, invalid_move_types, filename):
     fig = plt.figure()
     ax = fig.add_subplot(111, label="1")
-
     ax.plot(x, epsilons, color="C0")
     ax.set_xlabel("Episode", color="C0")
     ax.set_ylabel("Epsilon", color="C0")
     ax.tick_params(axis='x', colors="C0")
     ax.tick_params(axis='y', colors="C0")
-
     plt.savefig(filename + '.png')
     plt.close(fig)
 
@@ -56,24 +54,47 @@ def plot_learning_curve(x, scores, epsilons, steps, filename):
     ax2 = fig2.add_subplot(111, label="2")
     ax2.plot(x, scores, color="C1")
     ax2.set_xlabel("Episode", color="C1")
-    ax2.set_ylabel('Average steps', color="C1")
+    ax2.set_ylabel('Average score', color="C1")
     ax2.tick_params(axis='x', colors="C1")
     ax2.tick_params(axis='y', colors="C1")
-
     plt.savefig(filename + "_1" + '.png')
     plt.close(fig2)
 
     fig3 = plt.figure()
-    ax3 = fig3.add_subplot(111, label="2")
-
+    ax3 = fig3.add_subplot(111, label="3")
     ax3.scatter(x, steps, color="C2")
     ax3.set_xlabel("Episode", color="C2")
-    ax3.set_ylabel('Average score', color="C2")
+    ax3.set_ylabel('Average steps', color="C2")
     ax3.tick_params(axis='x', colors="C2")
     ax3.tick_params(axis='y', colors="C2")
-
     plt.savefig(filename + "_2" + '.png')
     plt.close(fig3)
+
+    fig4 = plt.figure()
+    ax4 = fig4.add_subplot(111, label="4")
+    labels = ["moved more than 1 level higher", "build on dome", "moved to dome", "build on occupied tile",  "moved to occupied tile", "build outside board", "moved outside board"]
+    ax4.bar(labels,invalid_move_types)
+    plt.xticks(rotation=45, ha='right')
+    plt.savefig(filename + "_3_" + str(x[-1]) + ".png", bbox_inches="tight")
+    plt.close(fig4)
+
+
+def update_invalid_move_types(message, types):
+    if message == "moved more than 1 level higher":
+        types[0] += 1
+    elif message == "build on dome":
+        types[1] += 1
+    elif message == "moved to dome":
+        types[2] += 1
+    elif message == "build on occupied tile":
+        types[3] += 1
+    elif message == "moved to occupied tile":
+        types[4] += 1
+    elif message == "build outside board":
+        types[5] += 1
+    elif message == "moved outside board":
+        types[6] += 1
+    return types
 
 # @profile
 def main():  # vypisovat cas epizody/ epizod
@@ -98,6 +119,8 @@ def main():  # vypisovat cas epizody/ epizod
         total_score = 0
         scores, eps_history, steps_array, episodes_num = [], [], [], []
         win_count = 0
+        invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
+        last_message = ""
 
         start_time = datetime.now()
         last_timestamp = datetime.now()
@@ -115,13 +138,15 @@ def main():  # vypisovat cas epizody/ epizod
 
             episode_steps = 0
             episode_score = 0
+
             while not done:
                 action = agent.choose_action(observation)  # env by mohol poslat agentovi ktore tahy su neplatne
                 observation_, reward, done, info = env.step(action)
+                last_message = info.get('message')
                 episode_score += reward
                 agent.store_transition(observation, action, reward, observation_, int(done))
                 if i % learn_frequency == 0:
-                    agent.learn()
+                    agent.learn(batch_learn_size)
                 observation = observation_
                 episode_steps += 1
 
@@ -142,6 +167,8 @@ def main():  # vypisovat cas epizody/ epizod
             total_steps += episode_steps
             total_score += episode_score
 
+            invalid_move_types = update_invalid_move_types(last_message, invalid_move_types)
+
             if i % log_every == 0:
                 average_score = total_score / log_every
                 average_steps = total_steps / log_every
@@ -156,10 +183,11 @@ def main():  # vypisovat cas epizody/ epizod
                 steps_array.append(average_steps)
                 eps_history.append(agent.epsilon)
                 episodes_num.append(i)
-                plot_learning_curve(episodes_num, scores, eps_history, steps_array, figure_file)
+                plot_learning_curve(episodes_num, scores, eps_history, steps_array, invalid_move_types, figure_file)
 
                 total_steps = 0
                 total_score = 0
+                invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
 
         end_timestamp = datetime.now()
         end_elapsed_time = datetime.now() - start_time

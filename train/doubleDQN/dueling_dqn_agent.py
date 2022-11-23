@@ -73,11 +73,11 @@ class DuelingDQNAgent(object):
 
 
     # @profile
-    def learn(self):
+    def learn(self, batch_learn_size):
         if self.memory.mem_cntr < self.batch_size:          # mem cntr iba na zaciatku
             return
 
-        for i in range(30):
+        for i in range(batch_learn_size):
 
             self.q_eval.optimizer.zero_grad()
 

@@ -2,7 +2,7 @@ from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
 
 # ENTER A SEED OF A PRE TRAINED MODEL
-seed = 75987
+seed = 72888
 
 def main():
     env = MyEnv()
