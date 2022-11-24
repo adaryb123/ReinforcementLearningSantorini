@@ -39,7 +39,7 @@ class MyEnv(gym.Env):
             if end:
                 return self.encode_input(self.board), 10, 1, {"move": chosenMove.__str__(), "player": self.players_turn,  "valid": "WIN", "win": True, "message": ""}
             else:
-                reward = self.get_player_height_diff(self.board)
+                reward = self.get_player_height_diff(self.board)        # iba jeho vysku
                 self.set_next_player()
                 return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(), "player": self.get_prev_player(),  "valid": "VALID", "win": False, "message": ""}
 

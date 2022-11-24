@@ -39,10 +39,10 @@ class DuelingDQNAgent(object):
 
     def sample_memory(self):
         state, action, reward, new_state, done = \
-                                self.memory.sample_buffer(self.batch_size)
+                                self.memory.sample_buffer(self.batch_size)      #staci volat tato funkcia asi
 
-        states = T.tensor(state).to(self.q_eval.device)
-        rewards = T.tensor(reward).to(self.q_eval.device)
+        states = T.tensor(state).to(self.q_eval.device)     # lepsie rovno do konstruktoru
+        rewards = T.tensor(reward).to(self.q_eval.device)       # v momente ako bude replay buffer cely v torchi, tieto riadky uz nebude treba
         dones = T.tensor(done).to(self.q_eval.device)
         actions = T.tensor(action).to(self.q_eval.device)
         states_ = T.tensor(new_state).to(self.q_eval.device)
@@ -52,18 +52,18 @@ class DuelingDQNAgent(object):
 
     def choose_action(self, observation):
         if np.random.random() > self.epsilon:
-            state = np.array([observation], copy=False, dtype=np.float32)
+            state = np.array([observation], copy=False, dtype=np.float32)           # torch
             state_tensor = T.tensor(state).to(self.q_eval.device)
             _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
 
             action = T.argmax(advantages).item()
         else:
-            action = np.random.choice(self.action_space)
+            action = np.random.choice(self.action_space)            #torch
 
         return action
 
     def replace_target_network(self):
-        if self.replace_target_cnt is not None and \
+        if self.replace_target_cnt is not None and \                    # skusit experimentovat s inou hodnotou replace (menej casto)
            self.learn_step_counter % self.replace_target_cnt == 0:
             self.q_next.load_state_dict(self.q_eval.state_dict())
 
@@ -103,6 +103,7 @@ class DuelingDQNAgent(object):
 
             loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
             loss.backward()         #96 percent casu travi tu
+            #synchronne volanie cudy - cuda launch blocking
             self.q_eval.optimizer.step()
             self.learn_step_counter += 1
 

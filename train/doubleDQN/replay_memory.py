@@ -4,7 +4,7 @@ class ReplayBuffer(object):
     def __init__(self, max_size, input_shape, n_actions):
         self.mem_size = max_size
         self.mem_cntr = 0
-        self.state_memory = np.zeros((self.mem_size, *input_shape),
+        self.state_memory = np.zeros((self.mem_size, *input_shape),             #device = cuda
                                      dtype=np.float32)
         self.new_state_memory = np.zeros((self.mem_size, *input_shape),
                                          dtype=np.float32)
@@ -24,7 +24,7 @@ class ReplayBuffer(object):
 
     def sample_buffer(self, batch_size):
         max_mem = min(self.mem_cntr, self.mem_size)
-        batch = np.random.choice(max_mem, batch_size, replace=False)
+        batch = np.random.choice(max_mem, batch_size, replace=False)        #torch
 
         states = self.state_memory[batch]
         actions = self.action_memory[batch]

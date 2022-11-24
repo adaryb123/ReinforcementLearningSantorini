@@ -12,14 +12,14 @@ from line_profiler_pycharm import profile
 # load = False
 
 # if continuing on an already trained model
-seed = 72888
+seed = 97620
 load = True
 
 n_episodes = 500000
 epsilon = 0.75
 eps_min = 0.01
 log_every = 5000
-learn_frequency = 1000
+learn_frequency = 100
 batch_learn_size = 30
 reward_for_win = 10
 
