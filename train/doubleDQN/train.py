@@ -8,17 +8,17 @@ from datetime import datetime
 from line_profiler_pycharm import profile
 
 # if training a new model
-# seed = random.randint(10000,99999)
-# load = False
+seed = random.randint(10000,99999)
+load = False
 
 # if continuing on an already trained model
-seed = 97620
-load = True
+# seed = 97620
+# load = True
 
 n_episodes = 500000
 epsilon = 0.75
 eps_min = 0.01
-log_every = 5000
+log_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
 reward_for_win = 10
@@ -39,7 +39,7 @@ def setup_output_files_directories():
         os.makedirs(plots_dir)
 
 
-def plot_learning_curve(x, scores, epsilons, steps, invalid_move_types, filename):
+def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     fig = plt.figure()
     ax = fig.add_subplot(111, label="1")
     ax.plot(x, epsilons, color="C0")
@@ -62,7 +62,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_move_types, filename
 
     fig3 = plt.figure()
     ax3 = fig3.add_subplot(111, label="3")
-    ax3.scatter(x, steps, color="C2")
+    ax3.plot(x, steps, color="C2")
     ax3.set_xlabel("Episode", color="C2")
     ax3.set_ylabel('Average steps', color="C2")
     ax3.tick_params(axis='x', colors="C2")
@@ -70,14 +70,23 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_move_types, filename
     plt.savefig(filename + "_2" + '.png')
     plt.close(fig3)
 
+    labels = ["moved more than 1 level higher", "build on dome", "moved to dome", "build on occupied tile",
+              "moved to occupied tile", "build outside board", "moved outside board"]
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111, label="4")
-    labels = ["moved more than 1 level higher", "build on dome", "moved to dome", "build on occupied tile",  "moved to occupied tile", "build outside board", "moved outside board"]
-    ax4.bar(labels,invalid_move_types)
-    plt.xticks(rotation=45, ha='right')
-    plt.savefig(filename + "_3_" + str(x[-1]) + ".png", bbox_inches="tight")
+    ax4.plot(x, invalid_moves[0], label=labels[0])
+    ax4.plot(x, invalid_moves[1], label=labels[1])
+    ax4.plot(x, invalid_moves[2], label=labels[2])
+    ax4.plot(x, invalid_moves[3], label=labels[3])
+    ax4.plot(x, invalid_moves[4], label=labels[4])
+    ax4.plot(x, invalid_moves[5], label=labels[5])
+    ax4.plot(x, invalid_moves[6], label=labels[6])
+    ax4.set_xlabel('Episode')
+    ax4.set_ylabel('Count')
+    ax4.legend()
+    # ax4.legend(loc='upper right')
+    plt.savefig(filename + "_3" + '.png')
     plt.close(fig4)
-
 
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
@@ -95,6 +104,13 @@ def update_invalid_move_types(message, types):
     elif message == "moved outside board":
         types[6] += 1
     return types
+
+
+def update_invalid_moves_over_time(total, recent):
+    for i in range(len(recent)):
+        total[i].append(recent[i])
+    return total
+
 
 # @profile
 def main():  # vypisovat cas epizody/ epizod
@@ -119,7 +135,8 @@ def main():  # vypisovat cas epizody/ epizod
         total_score = 0
         scores, eps_history, steps_array, episodes_num = [], [], [], []
         win_count = 0
-        invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
+        invalid_move_types = [0,0,0,0,0,0,0]
+        invalid_moves_over_time = [[], [], [], [], [], [], []]
         last_message = ""
 
         start_time = datetime.now()
@@ -183,7 +200,9 @@ def main():  # vypisovat cas epizody/ epizod
                 steps_array.append(average_steps)
                 eps_history.append(agent.epsilon)
                 episodes_num.append(i)
-                plot_learning_curve(episodes_num, scores, eps_history, steps_array, invalid_move_types, figure_file)
+
+                invalid_moves_over_time = update_invalid_moves_over_time(invalid_moves_over_time, invalid_move_types)
+                plot_learning_curve(episodes_num, scores, eps_history, steps_array, invalid_moves_over_time, figure_file)
 
                 total_steps = 0
                 total_score = 0

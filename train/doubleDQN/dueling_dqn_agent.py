@@ -63,8 +63,8 @@ class DuelingDQNAgent(object):
         return action
 
     def replace_target_network(self):
-        if self.replace_target_cnt is not None and \                    # skusit experimentovat s inou hodnotou replace (menej casto)
-           self.learn_step_counter % self.replace_target_cnt == 0:
+        if self.replace_target_cnt is not None and \
+           self.learn_step_counter % self.replace_target_cnt == 0:      # skusit experimentovat s inou hodnotou replace (menej casto)
             self.q_next.load_state_dict(self.q_eval.state_dict())
 
     def decrement_epsilon(self):
