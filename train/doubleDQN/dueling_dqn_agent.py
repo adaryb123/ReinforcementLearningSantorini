@@ -52,8 +52,10 @@ class DuelingDQNAgent(object):
 
     def choose_action(self, observation):
         if np.random.random() > self.epsilon:
-            state = np.array([observation], copy=False, dtype=np.float32)           # torch
-            state_tensor = T.tensor(state).to(self.q_eval.device)
+            # state = np.array([observation], copy=False, dtype=np.float32)           # torch
+            # state_tensor = T.tensor(observation).to(self.q_eval.device)
+            print(observation)
+            state_tensor = observation.to(self.q_eval.device)
             _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
 
             action = T.argmax(advantages).item()

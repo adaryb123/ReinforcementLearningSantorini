@@ -3,6 +3,7 @@ from gym import spaces
 import numpy as np
 from engine.Board import Board
 from engine.Move import Move
+import torch as T
 
 class MyEnv(gym.Env):
 
@@ -86,29 +87,41 @@ class MyEnv(gym.Env):
         self.board = Board()
         self.prev_actions = []
         self.players_turn = "white"
-        return np.array(self.encode_input(self.board))
-
+        # return np.array(self.encode_input(self.board))
+        return self.encode_input(self.board)
 
     def encode_input(self, board):
-        inputTensor = []
-        board_heigths = []
-        for i in board.tiles:
-            row = []
-            for j in i:
-                row.append(j.level)
-            board_heigths.append(row)
-        inputTensor.append(board_heigths)
-        board_players = []
-        for i in board.tiles:
-            row = []
-            for j in i:
+        inputTensor = T.empty((2, 5, 5), dtype=T.float32)
+        for i in range(len(board.tiles)):
+            for j in range(5):
+                inputTensor[0, i, j] = board.tiles[i][j].level
                 if self.players_turn == "white":
-                    row.append(j.player)
+                    inputTensor[1, i, j] = board.tiles[i][j].player
                 else:
-                    row.append(-j.player)
-            board_players.append(row)
-        inputTensor.append(board_players)
+                    inputTensor[1, i, j] = - board.tiles[i][j].player
+        # inputTensor = []
+        # board_heigths = []
+        # for i in range(len(board.tiles)):
+            # row = []
+            # for j in range(5):
+                # row.append(board.tiles[i][j].level)
+                # inputTensor[0, i, j] = board.tiles[i][j].level
+            # board_heigths.append(row)
+        # inputTensor.append(board_heigths)
 
+        # board_players = []
+        # for i in range(5):
+            # row = []
+            # for j in range(5):
+            #     if self.players_turn == "white":
+                    # row.append(board.tiles[i][j].player)
+                    # inputTensor[1, i, j] = board.tiles[i][j].player
+                # else:
+                    # row.append(- board.tiles[i][j].player)
+                    # inputTensor[1, i, j] = - board.tiles[i][j].player
+            # board_players.append(row)
+        # inputTensor.append(board_players)
+        # print(inputTensor)
         return inputTensor
 
     def render(self):
