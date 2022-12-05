@@ -9,19 +9,21 @@ from line_profiler_pycharm import profile
 
 # if training a new model
 seed = random.randint(10000,99999)
+# seed = "150k-coop-150k-compet"
 load = False
 
 # if continuing on an already trained model
 # seed = 97620
 # load = True
 
-n_episodes = 500000
-epsilon = 0.75
+n_episodes = 150000
+epsilon = 0.4
 eps_min = 0.01
 log_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
 reward_for_win = 10
+mode = "competitive"
 
 
 def setup_output_files_directories():
@@ -74,11 +76,11 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
               "moved to occupied tile", "build outside board", "moved outside board"]
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111, label="4")
-    ax4.plot(x, invalid_moves[0], label=labels[0])
-    ax4.plot(x, invalid_moves[1], label=labels[1])
-    ax4.plot(x, invalid_moves[2], label=labels[2])
-    ax4.plot(x, invalid_moves[3], label=labels[3])
-    ax4.plot(x, invalid_moves[4], label=labels[4])
+    ax4.plot(x, invalid_moves[0], '--', label=labels[0])
+    ax4.plot(x, invalid_moves[1], '--', label=labels[1])
+    ax4.plot(x, invalid_moves[2], ':', label=labels[2])
+    ax4.plot(x, invalid_moves[3], ':', label=labels[3])
+    ax4.plot(x, invalid_moves[4], ':', label=labels[4])
     ax4.plot(x, invalid_moves[5], label=labels[5])
     ax4.plot(x, invalid_moves[6], label=labels[6])
     ax4.set_xlabel('Episode')
@@ -116,6 +118,7 @@ def update_invalid_moves_over_time(total, recent):
 def main():  # vypisovat cas epizody/ epizod
     with open('logs/train_log.txt', 'w') as logfile:
         env = MyEnv()
+        env.mode = mode
         env.reset()
         best_score = -np.inf
 
