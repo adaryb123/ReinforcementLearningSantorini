@@ -66,6 +66,30 @@ class MyEnv(gym.Env):
                     return self.encode_input(self.board), 1 , 0, {"move": chosenMove.__str__(),
                                                                       "player": self.get_prev_player(),
                                                                       "valid": "VALID", "win": False, "message": ""}
+        elif self.mode == "single":
+            chosenMove = self.create_move(action)
+            valid, log = self.check_move_valid(chosenMove, self.board)
+            if not valid:
+                return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
+                                                               "player": self.players_turn, "valid": "INVALID",
+                                                               "win": False, "message": log}
+            else:
+                self.prev_actions.append(chosenMove)
+                self.board.update_board_after_move(chosenMove)
+                end, _ = self.board.check_if_game_ended(self.players_turn)
+                if end:
+                    return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
+                                                                   "player": self.players_turn, "valid": "WIN",
+                                                                   "win": True, "message": ""}
+                else:
+                    reward = self.get_player_height(self.board)
+                    self.set_next_player()
+                    return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
+                                                                      "player": self.get_prev_player(),
+                                                                      "valid": "VALID", "win": False, "message": ""}
+
+
+
         else:
                 print("unknown mode")
                 exit(0)
