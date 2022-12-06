@@ -17,13 +17,13 @@ load = False
 # load = True
 
 n_episodes = 150000
-epsilon = 0.4
+epsilon = 0.7
 eps_min = 0.01
 log_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
-reward_for_win = 10
-mode = "competitive"
+reward_for_win = 100
+mode = "cooperative" # cooperative or competitive
 
 
 def setup_output_files_directories():

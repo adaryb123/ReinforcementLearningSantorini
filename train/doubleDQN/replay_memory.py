@@ -3,7 +3,7 @@ import random
 import torch as T
 
 class ReplayBuffer(object):
-    def __init__(self, max_size, input_shape, n_actions):
+    def __init__(self, max_size, input_shape, device):
         self.mem_size = max_size
         self.mem_cntr = 0
         # self.state_memory = np.zeros((self.mem_size, *input_shape),             #device = cuda
@@ -20,6 +20,8 @@ class ReplayBuffer(object):
         self.reward_memory = T.zeros(self.mem_size, dtype=T.float32)
         self.terminal_memory = T.zeros(self.mem_size, dtype=T.bool)
 
+        self.device = device
+
     def store_transition(self, state, action, reward, state_, done):
         index = self.mem_cntr % self.mem_size
         self.state_memory[index] = state
@@ -34,10 +36,10 @@ class ReplayBuffer(object):
         # batch = np.random.choice(max_mem, batch_size, replace=False)        #torch
         batch = random.sample(range(max_mem), batch_size)
         batch = T.tensor(batch)
-        states = self.state_memory[batch]
-        actions = self.action_memory[batch]
-        rewards = self.reward_memory[batch]
-        states_ = self.new_state_memory[batch]
-        terminal = self.terminal_memory[batch]
+        states = self.state_memory[batch].to(self.device)
+        actions = self.action_memory[batch].to(self.device)
+        rewards = self.reward_memory[batch].to(self.device)
+        states_ = self.new_state_memory[batch].to(self.device)
+        terminal = self.terminal_memory[batch].to(self.device)
 
         return states, actions, rewards, states_, terminal

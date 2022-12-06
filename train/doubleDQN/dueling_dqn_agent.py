@@ -3,6 +3,7 @@ import torch as T
 from deep_q_network import DuelingDeepQNetwork
 from replay_memory import ReplayBuffer
 from line_profiler_pycharm import profile
+import random
 
 class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
@@ -20,10 +21,11 @@ class DuelingDQNAgent(object):
         self.algo = algo
         self.env_name = env_name
         self.chkpt_dir = chkpt_dir
-        self.action_space = [i for i in range(n_actions)]
+        # self.action_space = [i for i in range(n_actions)]
         self.learn_step_counter = 0
 
-        self.memory = ReplayBuffer(mem_size, input_dims, n_actions)
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
+        self.memory = ReplayBuffer(mem_size, input_dims, self.device)
 
         self.q_eval = DuelingDeepQNetwork(self.lr, self.n_actions,
                         input_dims=self.input_dims,
@@ -38,29 +40,29 @@ class DuelingDQNAgent(object):
         self.memory.store_transition(state, action, reward, state_, done)
 
     def sample_memory(self):
-        state, action, reward, new_state, done = \
-                                self.memory.sample_buffer(self.batch_size)      #staci volat tato funkcia asi
+        state, action, reward, new_state, done = self.memory.sample_buffer(self.batch_size)      #staci volat tato funkcia asi
 
-        states = T.tensor(state).to(self.q_eval.device)     # lepsie rovno do konstruktoru
-        rewards = T.tensor(reward).to(self.q_eval.device)       # v momente ako bude replay buffer cely v torchi, tieto riadky uz nebude treba
-        dones = T.tensor(done).to(self.q_eval.device)
-        actions = T.tensor(action).to(self.q_eval.device)
-        states_ = T.tensor(new_state).to(self.q_eval.device)
+        states = state.to(self.q_eval.device)     # lepsie rovno do konstruktoru
+        rewards = reward.to(self.q_eval.device)       # v momente ako bude replay buffer cely v torchi, tieto riadky uz nebude treba
+        dones = done.to(self.q_eval.device)
+        actions = action.to(self.q_eval.device)
+        states_ = new_state.to(self.q_eval.device)
 
         return states, actions, rewards, states_, dones
 
 
     def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
+        if random.random() > self.epsilon:
             # state = np.array([observation], copy=False, dtype=np.float32)           # torch
             # state_tensor = T.tensor(observation).to(self.q_eval.device)
-            print(observation)
-            state_tensor = observation.to(self.q_eval.device)
-            _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
+            # print(observation)
+            # state_tensor = observation.to(self.q_eval.device)
+            _, advantages = self.q_eval.forward(observation)            #tu by sa dali osetrovat nemozne tahy
 
             action = T.argmax(advantages).item()
         else:
-            action = np.random.choice(self.action_space)            #torch
+            # action = np.random.choice(self.action_space)            #torch
+            action = random.randint(0, self.n_actions-1)
 
         return action
 

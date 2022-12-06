@@ -16,6 +16,7 @@ class MyEnv(gym.Env):
         self.players_turn = "white"
         self.prev_actions = []
         self.mode = "cooperative" # cooperative or competitive
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
 
     def set_next_player(self):
         if self.players_turn == "white":
@@ -45,7 +46,7 @@ class MyEnv(gym.Env):
                     reward = self.get_player_height_diff(self.board)        # iba jeho vysku
                     self.set_next_player()
                     return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(), "player": self.get_prev_player(),  "valid": "VALID", "win": False, "message": ""}
-        elif self.mode == "competitive":
+        elif self.mode == "cooperative":
             chosenMove = self.create_move(action)
             valid, log = self.check_move_valid(chosenMove, self.board)
             if not valid:
@@ -61,7 +62,6 @@ class MyEnv(gym.Env):
                                                                   "player": self.players_turn, "valid": "WIN",
                                                                   "win": True, "message": ""}
                 else:
-                    # reward = self.get_player_height_diff(self.board)  # iba jeho vysku
                     self.set_next_player()
                     return self.encode_input(self.board), 1 , 0, {"move": chosenMove.__str__(),
                                                                       "player": self.get_prev_player(),
@@ -83,6 +83,16 @@ class MyEnv(gym.Env):
 
         return height_diff
 
+    def get_player_height(self, board):
+        height = 0
+        for i in range(5):
+            for j in range(5):
+                if board.tiles[i][j].player == self.players_turn:
+                    height += board.tiles[i][j].level
+
+        return height
+
+
     def reset(self):
         self.board = Board()
         self.prev_actions = []
@@ -91,14 +101,14 @@ class MyEnv(gym.Env):
         return self.encode_input(self.board)
 
     def encode_input(self, board):
-        inputTensor = T.empty((2, 5, 5), dtype=T.float32)
+        inputTensor = T.empty((1, 2, 5, 5), dtype=T.float32, device=self.device)
         for i in range(len(board.tiles)):
             for j in range(5):
-                inputTensor[0, i, j] = board.tiles[i][j].level
+                inputTensor[0, 0, i, j] = board.tiles[i][j].level
                 if self.players_turn == "white":
-                    inputTensor[1, i, j] = board.tiles[i][j].player
+                    inputTensor[0, 1, i, j] = board.tiles[i][j].player
                 else:
-                    inputTensor[1, i, j] = - board.tiles[i][j].player
+                    inputTensor[0, 1, i, j] = - board.tiles[i][j].player
         # inputTensor = []
         # board_heigths = []
         # for i in range(len(board.tiles)):
