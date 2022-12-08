@@ -9,7 +9,7 @@ from line_profiler_pycharm import profile
 
 # if training a new model
 seed = random.randint(10000,99999)
-# seed = "150k-coop-150k-compet"
+seed = "coop-without-torch"
 load = False
 
 # if continuing on an already trained model
@@ -17,7 +17,7 @@ load = False
 # load = True
 
 n_episodes = 150000
-epsilon = 0.7
+epsilon = 1.00
 eps_min = 0.01
 log_every = 1000
 learn_frequency = 100

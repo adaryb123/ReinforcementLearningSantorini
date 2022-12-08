@@ -40,15 +40,15 @@ class DuelingDQNAgent(object):
         self.memory.store_transition(state, action, reward, state_, done)
 
     def sample_memory(self):
-        state, action, reward, new_state, done = self.memory.sample_buffer(self.batch_size)      #staci volat tato funkcia asi
+        # state, action, reward, new_state, done = self.memory.sample_buffer(self.batch_size)      #staci volat tato funkcia asi
+        return self.memory.sample_buffer(self.batch_size)
+        # states = state.to(self.q_eval.device)     # lepsie rovno do konstruktoru
+        # rewards = reward.to(self.q_eval.device)       # v momente ako bude replay buffer cely v torchi, tieto riadky uz nebude treba
+        # dones = done.to(self.q_eval.device)
+        # actions = action.to(self.q_eval.device)
+        # states_ = new_state.to(self.q_eval.device)
 
-        states = state.to(self.q_eval.device)     # lepsie rovno do konstruktoru
-        rewards = reward.to(self.q_eval.device)       # v momente ako bude replay buffer cely v torchi, tieto riadky uz nebude treba
-        dones = done.to(self.q_eval.device)
-        actions = action.to(self.q_eval.device)
-        states_ = new_state.to(self.q_eval.device)
-
-        return states, actions, rewards, states_, dones
+        # return states, actions, rewards, states_, dones
 
 
     def choose_action(self, observation):
