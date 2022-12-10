@@ -1,0 +1,17 @@
+config = {
+    'config_name': 'default_cooperative',
+    'mode': 'cooperative',
+    'n_episodes': 200000,
+    'epsilon': 1,
+    'eps_min': 0.01,
+    'checkpoint_every': 1000,
+    'learn_frequency': 100,
+    'learn_amount': 30,
+    'reward_for_win': 100,
+    'gamma': 0.99,
+    'learning_rate': 0.0001,
+    'memory_size': 50000,
+    'batch_size': 32,
+    'replace_network_frequency': 10000,
+    'eps_dec': 1e-5,
+}

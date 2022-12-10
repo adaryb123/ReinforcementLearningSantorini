@@ -6,8 +6,8 @@ from line_profiler_pycharm import profile
 
 class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
-                 mem_size, batch_size, eps_min=0.01, eps_dec=5e-7,
-                 replace=1000, seed=None, chkpt_dir=None):
+                 mem_size, batch_size, eps_min, eps_dec,
+                 replace, learn_amount, seed=None, checkpoint_dir=None):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -18,7 +18,8 @@ class DuelingDQNAgent(object):
         self.eps_dec = eps_dec
         self.replace_target_cnt = replace
         self.seed = seed
-        self.chkpt_dir = chkpt_dir
+        self.chkpt_dir = checkpoint_dir
+        self.learn_amount = learn_amount
         self.action_space = [i for i in range(n_actions)]
         self.learn_step_counter = 0
 
@@ -72,11 +73,11 @@ class DuelingDQNAgent(object):
 
 
     # @profile
-    def learn(self, batch_learn_size):
+    def learn(self):
         if self.memory.mem_cntr < self.batch_size:          # mem cntr iba na zaciatku
             return
 
-        for i in range(batch_learn_size):
+        for i in range(self.learn_amount):
 
             self.q_eval.optimizer.zero_grad()
 

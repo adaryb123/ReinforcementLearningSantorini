@@ -6,9 +6,10 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
+from configs import default_cooperative as conf
 
 # if training a new model
-seed = random.randint(10000,99999)
+seed = random.randint(10000, 99999)
 # seed = "150k-coop-150k-compet"
 load = False
 
@@ -16,15 +17,22 @@ load = False
 # seed = 97620
 # load = True
 
-n_episodes = 300000
-epsilon = 1
-eps_min = 0.01
-checkpoint_every = 1000
-learn_frequency = 100
-batch_learn_size = 30
-reward_for_win = 100
-mode = "cooperative"
 
+C = conf.config
+n_episodes = C.get('n_episodes')
+epsilon = C.get('epsilon')
+eps_min = C.get('eps_min')
+checkpoint_every = C.get('checkpoint_every')
+learn_frequency = C.get('learn_frequency')
+learn_amount = C.get('learn_amount')
+reward_for_win = C.get('reward_for_win')
+mode = C.get('mode')
+gamma = C.get('gamma')
+lr = C.get('learning_rate')
+mem_size = C.get('memory_size')
+batch_size = C.get('batch_size')
+replace = C.get('replace_network_frequency')
+eps_dec = C.get('eps_dec')
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -138,11 +146,11 @@ def main():  # vypisovat cas epizody/ epizod
         env.reset()
         best_score = -np.inf
 
-        agent = DuelingDQNAgent(gamma=0.99, epsilon=epsilon, lr=0.0001,
+        agent = DuelingDQNAgent(gamma=gamma, epsilon=epsilon, lr=lr,
                                 input_dims=env.observation_space.shape,
-                                n_actions=env.action_space.n, mem_size=50000, eps_min=eps_min,
-                                batch_size=32, replace=10000, eps_dec=1e-5,
-                                seed=seed, chkpt_dir='models/')
+                                n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
+                                batch_size=batch_size, replace=replace, eps_dec=eps_dec,
+                                learn_amount=learn_amount, seed=seed, checkpoint_dir='models/')
 
         figure_file = 'plots/' + str(seed) + "/"
 
@@ -160,7 +168,7 @@ def main():  # vypisovat cas epizody/ epizod
 
         start_time = datetime.now()
         last_timestamp = datetime.now()
-        start_log = "start: " + " seed: " + str(seed) + " timestamp: " + str(start_time)
+        start_log = "start: " + " seed: " + str(seed) + " timestamp: " + str(start_time) + " config: " + C.get('config_name') + "\n"
         logfile.write(start_log)
         print(start_log)
 
@@ -182,7 +190,7 @@ def main():  # vypisovat cas epizody/ epizod
                 episode_score += reward
                 agent.store_transition(observation, action, reward, observation_, int(done))
                 if i % learn_frequency == 0:
-                    agent.learn(batch_learn_size)
+                    agent.learn()
                 observation = observation_
                 episode_steps += 1
 
