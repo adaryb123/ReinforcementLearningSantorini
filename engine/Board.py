@@ -22,7 +22,7 @@ class Board:
 
     def setup_players(self):
         finished = 0
-        current = -1
+        current = -2
         black1 = 0
         black2 = 0
         white1 = 0
@@ -35,11 +35,13 @@ class Board:
                 finished += 1
                 if finished == 1:
                     black1 = (row, col)
+                    current = -1
                 elif finished == 2:
-                    current = 1
                     black2 = (row, col)
+                    current = 1
                 elif finished == 3:
                     white1 = (row, col)
+                    current = 2
                 elif finished == 4:
                     white2 = (row, col)
 

@@ -19,7 +19,7 @@ load = False
 n_episodes = 150000
 epsilon = 1
 eps_min = 0.01
-log_every = 1000
+checkpoint_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
 reward_for_win = 10
@@ -90,8 +90,9 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     ax4.plot(x, invalid_moves[6], label=labels[6])
     ax4.set_xlabel('Episode')
     ax4.set_ylabel('Count')
-    ax4.legend()
-    # ax4.legend(loc='upper right')
+    box = ax.get_position()
+    ax4.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    ax4.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.savefig(filename + "invalid_moves.png")
     plt.close(fig4)
 
@@ -138,11 +139,12 @@ def main():  # vypisovat cas epizody/ epizod
         if load:
             agent.load_models()
 
-        total_steps = 0
-        total_score = 0
+        checkpoint_steps = 0
+        checkpoint_score = 0
+        total_wins = 0
+        checkpoint_wins = 0
         scores, eps_history, steps_array, episodes_num = [], [], [], []
-        win_count = 0
-        invalid_move_types = [0,0,0,0,0,0,0]
+        invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
         invalid_moves_over_time = [[], [], [], [], [], [], []]
         last_message = ""
 
@@ -156,7 +158,7 @@ def main():  # vypisovat cas epizody/ epizod
             done = False
             observation = env.reset()
 
-            if i % log_every == 0:
+            if i % checkpoint_every == 0:
                 logfile.write("start episode " + str(i) + " of " + str(n_episodes) + "\n")
                 logfile.write(env.render())
 
@@ -174,7 +176,7 @@ def main():  # vypisovat cas epizody/ epizod
                 observation = observation_
                 episode_steps += 1
 
-                if i % log_every == 0:
+                if i % checkpoint_every == 0:
                     action_log = "------------player: " + info.get("player") + " move: " + info.get(
                         "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
                     logfile.write(action_log)
@@ -184,22 +186,24 @@ def main():  # vypisovat cas epizody/ epizod
                 best_score = episode_score
 
             if reward == reward_for_win:
-                win_count += 1
+                checkpoint_wins += 1
+                total_wins += 1
 
-            agent.save_models()
-
-            total_steps += episode_steps
-            total_score += episode_score
+            checkpoint_steps += episode_steps
+            checkpoint_score += episode_score
 
             invalid_move_types = update_invalid_move_types(last_message, invalid_move_types)
 
-            if i % log_every == 0:
-                average_score = total_score / log_every
-                average_steps = total_steps / log_every
+            if i % checkpoint_every == 0:
+                agent.save_models()
+
+                average_score = checkpoint_score / checkpoint_every
+                average_steps = checkpoint_steps / checkpoint_every
                 elapsed_time = datetime.now() - last_timestamp
                 last_timestamp = datetime.now()
 
-                episode_log = "episode: " + str(i) + "/" + str(n_episodes) + " score: " + str(episode_score) + " best score: " + str(best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(agent.epsilon) + "\n   steps: " + str(episode_steps) + " average steps: " + str(average_steps) + " elapsed time: " + str(elapsed_time) + " win count: " + str(win_count) + "\n"
+                logfile.write("end episode " + str(i) + " of " + str(n_episodes) + "steps: " + str(episode_steps) + " score: " + str(episode_score) + "\n")
+                episode_log = "checkpoint: " + str(i) + "/" + str(n_episodes) + " best score: " + str(best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(agent.epsilon) + "\n" + " average steps: " + str(average_steps) + " elapsed time: " + str(elapsed_time) + " wins this checkpoint: " + str(checkpoint_wins) + " total wins: " + str(total_wins) + "\n"
                 logfile.write(episode_log)
                 print(episode_log)
 
@@ -211,8 +215,9 @@ def main():  # vypisovat cas epizody/ epizod
                 invalid_moves_over_time = update_invalid_moves_over_time(invalid_moves_over_time, invalid_move_types)
                 plot_learning_curve(episodes_num, scores, eps_history, steps_array, invalid_moves_over_time, figure_file)
 
-                total_steps = 0
-                total_score = 0
+                checkpoint_steps = 0
+                checkpoint_score = 0
+                checkpoint_wins = 0
                 invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
 
         end_timestamp = datetime.now()
