@@ -16,13 +16,13 @@ load = False
 # seed = 97620
 # load = True
 
-n_episodes = 150000
+n_episodes = 300000
 epsilon = 1
 eps_min = 0.01
 checkpoint_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
-reward_for_win = 10
+reward_for_win = 100
 mode = "cooperative"
 
 
@@ -46,7 +46,7 @@ def setup_output_files_directories():
         os.makedirs(plots_seed_dir)
 
 
-def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
+def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filename):
     fig = plt.figure()
     ax = fig.add_subplot(111, label="1")
     ax.plot(x, epsilons, color="C0")
@@ -96,6 +96,16 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     plt.savefig(filename + "invalid_moves.png")
     plt.close(fig4)
 
+    fig5 = plt.figure()
+    ax5 = fig5.add_subplot(111, label="5")
+    ax5.plot(x, wins, color="C2")
+    ax5.set_xlabel("Episode", color="C3")
+    ax5.set_ylabel('Wins', color="C3")
+    ax5.tick_params(axis='x', colors="C3")
+    ax5.tick_params(axis='y', colors="C3")
+    plt.savefig(filename + "wins.png")
+    plt.close(fig5)
+
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
         types[0] += 1
@@ -143,7 +153,7 @@ def main():  # vypisovat cas epizody/ epizod
         checkpoint_score = 0
         total_wins = 0
         checkpoint_wins = 0
-        scores, eps_history, steps_array, episodes_num = [], [], [], []
+        checkpoint_scores_array, checkpoint_epsilon_array, checkpoint_steps_array, episodes_num_array, checkpoint_wins_array = [], [], [], [], []
         invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
         invalid_moves_over_time = [[], [], [], [], [], [], []]
         last_message = ""
@@ -159,7 +169,7 @@ def main():  # vypisovat cas epizody/ epizod
             observation = env.reset()
 
             if i % checkpoint_every == 0:
-                logfile.write("start episode " + str(i) + " of " + str(n_episodes) + "\n")
+                logfile.write("\nstart episode " + str(i) + " of " + str(n_episodes) + "\n")
                 logfile.write(env.render())
 
             episode_steps = 0
@@ -202,18 +212,19 @@ def main():  # vypisovat cas epizody/ epizod
                 elapsed_time = datetime.now() - last_timestamp
                 last_timestamp = datetime.now()
 
-                logfile.write("end episode " + str(i) + " of " + str(n_episodes) + "steps: " + str(episode_steps) + " score: " + str(episode_score) + "\n")
+                logfile.write("\nend episode " + str(i) + " of " + str(n_episodes) + " steps: " + str(episode_steps) + " score: " + str(episode_score) + "\n")
                 episode_log = "checkpoint: " + str(i) + "/" + str(n_episodes) + " best score: " + str(best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(agent.epsilon) + "\n" + " average steps: " + str(average_steps) + " elapsed time: " + str(elapsed_time) + " wins this checkpoint: " + str(checkpoint_wins) + " total wins: " + str(total_wins) + "\n"
                 logfile.write(episode_log)
                 print(episode_log)
 
-                scores.append(average_score)
-                steps_array.append(average_steps)
-                eps_history.append(agent.epsilon)
-                episodes_num.append(i)
+                checkpoint_scores_array.append(average_score)
+                checkpoint_steps_array.append(average_steps)
+                checkpoint_epsilon_array.append(agent.epsilon)
+                episodes_num_array.append(i)
+                checkpoint_wins_array.append(checkpoint_wins)
 
                 invalid_moves_over_time = update_invalid_moves_over_time(invalid_moves_over_time, invalid_move_types)
-                plot_learning_curve(episodes_num, scores, eps_history, steps_array, invalid_moves_over_time, figure_file)
+                plot_learning_curve(episodes_num_array, checkpoint_scores_array, checkpoint_epsilon_array, checkpoint_steps_array, invalid_moves_over_time, checkpoint_wins_array, figure_file)
 
                 checkpoint_steps = 0
                 checkpoint_score = 0
