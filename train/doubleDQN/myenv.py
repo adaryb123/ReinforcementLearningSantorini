@@ -1,6 +1,5 @@
 import gym
 from gym import spaces
-import numpy as np
 from engine.Board import Board
 from engine.Move import Move
 
@@ -14,7 +13,7 @@ class MyEnv(gym.Env):
         self.board = Board()
         self.players_turn = "white"
         self.prev_actions = []
-        self.mode = "cooperative" # cooperative or competitive
+        self.mode = "cooperative" # cooperative or competitive or single
 
     def set_next_player(self):
         if self.players_turn == "white":
@@ -31,24 +30,9 @@ class MyEnv(gym.Env):
     def step(self, action):
         if self.mode == "competitive":
             chosenMove = self.create_move(action)
-            valid, log = self.check_move_valid(chosenMove,self.board)
-            if not valid:
-                return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(), "player": self.players_turn, "valid": "INVALID", "win": False, "message": log}
-            else:
-                self.prev_actions.append(chosenMove)
-                self.board.update_board_after_move(chosenMove)
-                end, _ = self.board.check_if_game_ended(self.players_turn)
-                if end:
-                    return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(), "player": self.players_turn,  "valid": "WIN", "win": True, "message": ""}
-                else:
-                    reward = self.get_player_height_diff(self.board)        # iba jeho vysku
-                    self.set_next_player()
-                    return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(), "player": self.get_prev_player(),  "valid": "VALID", "win": False, "message": ""}
-        elif self.mode == "competitive":
-            chosenMove = self.create_move(action)
             valid, log = self.check_move_valid(chosenMove, self.board)
             if not valid:
-                return self.encode_input(self.board), 0, 1, {"move": chosenMove.__str__(),
+                return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
                                                                "player": self.players_turn, "valid": "INVALID",
                                                                "win": False, "message": log}
             else:
@@ -57,17 +41,60 @@ class MyEnv(gym.Env):
                 end, _ = self.board.check_if_game_ended(self.players_turn)
                 if end:
                     return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
-                                                                  "player": self.players_turn, "valid": "WIN",
-                                                                  "win": True, "message": ""}
+                                                                   "player": self.players_turn, "valid": "WIN",
+                                                                   "win": True, "message": ""}
                 else:
-                    # reward = self.get_player_height_diff(self.board)  # iba jeho vysku
+                    reward = self.get_player_height_diff(self.board)  # iba jeho vysku
                     self.set_next_player()
-                    return self.encode_input(self.board), 1 , 0, {"move": chosenMove.__str__(),
+                    return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
+                                                                      "player": self.get_prev_player(),
+                                                                      "valid": "VALID", "win": False, "message": ""}
+
+        elif self.mode == "cooperative":
+            chosenMove = self.create_move(action)
+            valid, log = self.check_move_valid(chosenMove, self.board)
+            if not valid:
+                return self.encode_input(self.board), 0, 1, {"move": chosenMove.__str__(),
+                                                             "player": self.players_turn, "valid": "INVALID",
+                                                             "win": False, "message": log}
+            else:
+                self.prev_actions.append(chosenMove)
+                self.board.update_board_after_move(chosenMove)
+                end, _ = self.board.check_if_game_ended(self.players_turn)
+                if end:
+                    return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
+                                                                   "player": self.players_turn, "valid": "WIN",
+                                                                   "win": True, "message": ""}
+                else:
+                    self.set_next_player()
+                    return self.encode_input(self.board), 1, 0, {"move": chosenMove.__str__(),
+                                                                 "player": self.get_prev_player(),
+                                                                 "valid": "VALID", "win": False, "message": ""}
+
+        elif self.mode == "single":
+            chosenMove = self.create_move(action)
+            valid, log = self.check_move_valid(chosenMove, self.board)
+            if not valid:
+                return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
+                                                               "player": self.players_turn, "valid": "INVALID",
+                                                               "win": False, "message": log}
+            else:
+                self.prev_actions.append(chosenMove)
+                self.board.update_board_after_move(chosenMove)
+                end, _ = self.board.check_if_game_ended(self.players_turn)
+                if end:
+                    return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
+                                                                   "player": self.players_turn, "valid": "WIN",
+                                                                   "win": True, "message": ""}
+                else:
+                    reward = self.get_player_height(self.board)
+                    self.set_next_player()
+                    return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
                                                                       "player": self.get_prev_player(),
                                                                       "valid": "VALID", "win": False, "message": ""}
         else:
-                print("unknown mode")
-                exit(0)
+            print("unknown mode:"+str(self.mode))
+            exit(0)
 
     def get_player_height_diff(self, board):
         height_diff = 0
@@ -82,33 +109,42 @@ class MyEnv(gym.Env):
 
         return height_diff
 
+    def get_player_height(self, board):
+        height = 0
+        for i in range(5):
+            for j in range(5):
+                if board.tiles[i][j].player == self.players_turn:
+                    height += board.tiles[i][j].level
+
+        return height
+
     def reset(self):
         self.board = Board()
         self.prev_actions = []
         self.players_turn = "white"
-        return np.array(self.encode_input(self.board))
-
+        return self.encode_input(self.board)
 
     def encode_input(self, board):
         inputTensor = []
-        board_heigths = []
-        for i in board.tiles:
-            row = []
-            for j in i:
-                row.append(j.level)
-            board_heigths.append(row)
-        inputTensor.append(board_heigths)
+        board_heights = []
         board_players = []
-        for i in board.tiles:
-            row = []
-            for j in i:
-                if self.players_turn == "white":
-                    row.append(j.player)
-                else:
-                    row.append(-j.player)
-            board_players.append(row)
-        inputTensor.append(board_players)
 
+        for i in board.tiles:
+            row_heights = []
+            row_players = []
+
+            for j in i:
+                row_heights.append(j.level)
+                if self.players_turn == "white":
+                    row_players.append(j.player)
+                else:
+                    row_players.append(-j.player)
+
+            board_heights.append(row_heights)
+            board_players.append(row_players)
+
+        inputTensor.append(board_heights)
+        inputTensor.append(board_players)
         return inputTensor
 
     def render(self):

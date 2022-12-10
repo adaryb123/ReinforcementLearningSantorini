@@ -17,19 +17,21 @@ load = False
 # load = True
 
 n_episodes = 150000
-epsilon = 0.4
+epsilon = 1
 eps_min = 0.01
 log_every = 1000
 learn_frequency = 100
 batch_learn_size = 30
 reward_for_win = 10
-mode = "competitive"
+mode = "cooperative"
 
 
 def setup_output_files_directories():
     models_dir = "models"
     logs_dir = "logs"
     plots_dir = "plots"
+
+    plots_seed_dir = "plots/" + str(seed)
 
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
@@ -40,6 +42,9 @@ def setup_output_files_directories():
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
 
+    if not os.path.exists(plots_seed_dir):
+        os.makedirs(plots_seed_dir)
+
 
 def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     fig = plt.figure()
@@ -49,7 +54,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     ax.set_ylabel("Epsilon", color="C0")
     ax.tick_params(axis='x', colors="C0")
     ax.tick_params(axis='y', colors="C0")
-    plt.savefig(filename + '.png')
+    plt.savefig(filename + "epsilon.png")
     plt.close(fig)
 
     fig2 = plt.figure()
@@ -59,7 +64,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     ax2.set_ylabel('Average score', color="C1")
     ax2.tick_params(axis='x', colors="C1")
     ax2.tick_params(axis='y', colors="C1")
-    plt.savefig(filename + "_1" + '.png')
+    plt.savefig(filename + "scores.png")
     plt.close(fig2)
 
     fig3 = plt.figure()
@@ -69,7 +74,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     ax3.set_ylabel('Average steps', color="C2")
     ax3.tick_params(axis='x', colors="C2")
     ax3.tick_params(axis='y', colors="C2")
-    plt.savefig(filename + "_2" + '.png')
+    plt.savefig(filename + "steps.png")
     plt.close(fig3)
 
     labels = ["moved more than 1 level higher", "build on dome", "moved to dome", "build on occupied tile",
@@ -87,7 +92,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, filename):
     ax4.set_ylabel('Count')
     ax4.legend()
     # ax4.legend(loc='upper right')
-    plt.savefig(filename + "_3" + '.png')
+    plt.savefig(filename + "invalid_moves.png")
     plt.close(fig4)
 
 def update_invalid_move_types(message, types):
@@ -113,10 +118,10 @@ def update_invalid_moves_over_time(total, recent):
         total[i].append(recent[i])
     return total
 
-
 # @profile
 def main():  # vypisovat cas epizody/ epizod
-    with open('logs/train_log.txt', 'w') as logfile:
+    logfile_name = "logs/" + str(seed) + "_train"
+    with open(logfile_name, 'w') as logfile:
         env = MyEnv()
         env.mode = mode
         env.reset()
@@ -126,10 +131,9 @@ def main():  # vypisovat cas epizody/ epizod
                                 input_dims=env.observation_space.shape,
                                 n_actions=env.action_space.n, mem_size=50000, eps_min=eps_min,
                                 batch_size=32, replace=10000, eps_dec=1e-5,
-                                chkpt_dir='models/', algo='DuelingDQNAgent_' + str(seed),
-                                env_name='Santorini')
+                                seed=seed, chkpt_dir='models/')
 
-        figure_file = 'plots/' + str(seed)
+        figure_file = 'plots/' + str(seed) + "/"
 
         if load:
             agent.load_models()
