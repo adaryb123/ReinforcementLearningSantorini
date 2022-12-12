@@ -1,6 +1,6 @@
 config = {
-    'config_name': 'default_competitive',
-    'mode': 'competitive',
+    'config_name': 'default_cooperative',
+    'mode': 'cooperative',
     'n_episodes': 200000,
     'epsilon': 1,
     'eps_min': 0.01,

@@ -100,9 +100,9 @@ class MyEnv(gym.Env):
         height_diff = 0
         for i in range(5):
             for j in range(5):
-                if board.tiles[i][j].player == 1:
+                if board.tiles[i][j].player >= 1:
                     height_diff += board.tiles[i][j].level
-                elif board.tiles[i][j].player == -1:
+                elif board.tiles[i][j].player <= -1:
                     height_diff -= board.tiles[i][j].level
         if self.players_turn == "black":
             height_diff *= -1
@@ -113,8 +113,11 @@ class MyEnv(gym.Env):
         height = 0
         for i in range(5):
             for j in range(5):
-                if board.tiles[i][j].player == self.players_turn:
+                if board.tiles[i][j].player >= 1:
                     height += board.tiles[i][j].level
+
+        if self.players_turn == "black":
+            height *= -1
 
         return height
 

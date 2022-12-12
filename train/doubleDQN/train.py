@@ -6,11 +6,11 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import default_cooperative as conf
+from configs import default_competitive as conf
 
 # if training a new model
-seed = random.randint(10000, 99999)
-# seed = "150k-coop-150k-compet"
+# seed = random.randint(10000, 99999)
+seed = "200k-compet"
 load = False
 
 # if continuing on an already trained model
@@ -101,12 +101,13 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     box = ax.get_position()
     ax4.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax4.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.xticks(rotation=45)
     plt.savefig(filename + "invalid_moves.png")
     plt.close(fig4)
 
     fig5 = plt.figure()
     ax5 = fig5.add_subplot(111, label="5")
-    ax5.plot(x, wins, color="C2")
+    ax5.scatter(x, wins, color="C2")
     ax5.set_xlabel("Episode", color="C3")
     ax5.set_ylabel('Wins', color="C3")
     ax5.tick_params(axis='x', colors="C3")
