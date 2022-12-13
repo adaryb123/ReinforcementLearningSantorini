@@ -1,24 +1,39 @@
 from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
+from configs import coop_then_compet_then_compet as conf
 
-# ENTER A SEED OF A PRE TRAINED MODEL
-seed = 3
+C = conf.config
+n_episodes = C.get('n_episodes')
+epsilon = C.get('epsilon')
+eps_min = C.get('eps_min')
+checkpoint_every = C.get('checkpoint_every')
+learn_frequency = C.get('learn_frequency')
+learn_amount = C.get('learn_amount')
+reward_for_win = C.get('reward_for_win')
+mode = C.get('mode')
+gamma = C.get('gamma')
+lr = C.get('learning_rate')
+mem_size = C.get('memory_size')
+batch_size = C.get('batch_size')
+replace = C.get('replace_network_frequency')
+eps_dec = C.get('eps_dec')
+seed = C.get('model_name')
 
 def main():
     env = MyEnv()
+    env.mode = mode
     env.reset()
-    agent = DuelingDQNAgent(gamma=0.99, epsilon=0, lr=0.0001,
-                            input_dims=(env.observation_space.shape),
-                            n_actions=env.action_space.n, mem_size=50000, eps_min=0,
-                            batch_size=32, replace=10000, eps_dec=0,
-                            chkpt_dir='models/', algo='DuelingDQNAgent_' + str(seed),
-                            env_name='Santorini')
+    agent = DuelingDQNAgent(gamma=gamma, epsilon=0, lr=lr,
+                            input_dims=env.observation_space.shape,
+                            n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
+                            batch_size=batch_size, replace=replace, eps_dec=eps_dec,
+                            learn_amount=learn_amount, seed=seed, checkpoint_dir='models/')
 
-    agent.load_models()
+    agent.load_models(seed)
 
     done = False
     observation = env.reset()
-    print("start test \n")
+    print("start: " + " seed: " + str(seed) + " timestamp: " + " mode: " + str(mode) + "\n")
     print(env.render())
 
     n_steps = 0
@@ -27,14 +42,14 @@ def main():
         action = agent.choose_action(observation)
         observation_, reward, done, info = env.step(action)
         score += reward
-        action_log = "------------player: " + info.get("player") + " move: " + info.get("move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
+        action_log = "------------player: " + info.get("player") + " move: " + info.get("move") + " which is: " + info.get("valid") + ": " + info.get("message") + " reward: " + str(reward) + " score: " + str(score) + "\n"
         print(action_log)
         print(env.render())
 
         observation = observation_
         n_steps += 1
 
-    episode_log  = 'end test: ' + ' score: ' +str(score)  + ' steps ' + str(n_steps) + "\n"
+    episode_log  = 'end: ' + " seed: " + str(seed) +  ' score: ' +str(score)  + ' steps ' + str(n_steps) + "\n"
     print(episode_log)
 
 main()
