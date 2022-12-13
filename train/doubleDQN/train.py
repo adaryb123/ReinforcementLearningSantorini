@@ -7,6 +7,9 @@ import random
 from datetime import datetime
 from line_profiler_pycharm import profile
 
+os.environ['CUDA_LAUNCH_BLOCKING'] ='1'
+
+
 # if training a new model
 seed = random.randint(10000,99999)
 seed = "coop-without-torch"
@@ -114,7 +117,7 @@ def update_invalid_moves_over_time(total, recent):
     return total
 
 
-# @profile
+@profile
 def main():  # vypisovat cas epizody/ epizod
     with open('logs/train_log.txt', 'w') as logfile:
         env = MyEnv()
@@ -182,14 +185,13 @@ def main():  # vypisovat cas epizody/ epizod
             if reward == reward_for_win:
                 win_count += 1
 
-            agent.save_models()
-
             total_steps += episode_steps
             total_score += episode_score
 
             invalid_move_types = update_invalid_move_types(last_message, invalid_move_types)
 
             if i % log_every == 0:
+                agent.save_models()
                 average_score = total_score / log_every
                 average_steps = total_steps / log_every
                 elapsed_time = datetime.now() - last_timestamp

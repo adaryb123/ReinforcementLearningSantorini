@@ -50,7 +50,7 @@ class DuelingDQNAgent(object):
 
         # return states, actions, rewards, states_, dones
 
-
+    @profile
     def choose_action(self, observation):
         if random.random() > self.epsilon:
             # state = np.array([observation], copy=False, dtype=np.float32)           # torch
@@ -76,7 +76,7 @@ class DuelingDQNAgent(object):
                          if self.epsilon > self.eps_min else self.eps_min
 
 
-    # @profile
+    @profile
     def learn(self, batch_learn_size):
         if self.memory.mem_cntr < self.batch_size:          # mem cntr iba na zaciatku
             return

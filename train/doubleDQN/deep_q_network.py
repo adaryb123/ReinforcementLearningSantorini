@@ -17,10 +17,10 @@ class DuelingDeepQNetwork(nn.Module):
 
         fc_input_dims = self.calculate_conv_output_dims(input_dims)
 
-        self.fc1 = nn.Linear(fc_input_dims, 1024)
-        self.fc2 = nn.Linear(1024, 512)
-        self.V = nn.Linear(512, 1)
-        self.A = nn.Linear(512, n_actions)
+        # self.fc1 = nn.Linear(fc_input_dims, 1024)
+        # self.fc2 = nn.Linear(1024, 512)
+        # self.V = nn.Linear(512, 1)
+        # self.A = nn.Linear(512, n_actions)
 
         self.fc1 = nn.Linear(fc_input_dims, 200)
         self.fc2 = nn.Linear(200, 200)
