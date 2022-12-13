@@ -8,8 +8,11 @@ game_board = Board()
 white_moves = []
 black_moves = game_board.find_possible_moves("black")
 
-blackBot = MinMaxBot("black")
-whiteBot = MinMaxBot("white")
+# blackBot = MinMaxBot("black")
+# whiteBot = MinMaxBot("white")
+blackBot = RandomBot("black")
+whiteBot = RandomBot("white")
+
 
 print("starting board")
 print(game_board)

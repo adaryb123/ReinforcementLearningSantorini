@@ -1,6 +1,7 @@
 config = {
-    'config_name': 'default_cooperative',
+    'model_name': 'default_cooperative',
     'mode': 'cooperative',
+    'load': False,
     'n_episodes': 200000,
     'epsilon': 1,
     'eps_min': 0.01,

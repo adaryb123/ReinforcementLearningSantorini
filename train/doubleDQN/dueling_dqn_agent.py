@@ -117,6 +117,6 @@ class DuelingDQNAgent(object):
         self.q_eval.save_checkpoint()
         self.q_next.save_checkpoint()
 
-    def load_models(self):
-        self.q_eval.load_checkpoint()
-        self.q_next.load_checkpoint()
+    def load_models(self, old_seed):
+        self.q_eval.load_checkpoint(self.chkpt_dir + old_seed + "_q_eval")
+        self.q_next.load_checkpoint(self.chkpt_dir + old_seed + "_q_next")

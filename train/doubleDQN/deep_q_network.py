@@ -57,5 +57,6 @@ class DuelingDeepQNetwork(nn.Module):
     def save_checkpoint(self):
         T.save(self.state_dict(), self.checkpoint_file)
 
-    def load_checkpoint(self):
-        self.load_state_dict(T.load(self.checkpoint_file, map_location=self.device))
+    def load_checkpoint(self, checkpoint_file):
+        self.load_state_dict(T.load(checkpoint_file, map_location=self.device))
+        print(checkpoint_file + " loaded")

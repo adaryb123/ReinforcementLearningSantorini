@@ -6,12 +6,12 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import default_competitive as conf
+from configs import coop_then_compet_then_compet as conf
 
 # if training a new model
 # seed = random.randint(10000, 99999)
-seed = "200k-compet"
-load = False
+# seed = "200k-compet"
+# load = False
 
 # if continuing on an already trained model
 # seed = 97620
@@ -33,6 +33,11 @@ mem_size = C.get('memory_size')
 batch_size = C.get('batch_size')
 replace = C.get('replace_network_frequency')
 eps_dec = C.get('eps_dec')
+seed = C.get('model_name')
+load = C.get('load')
+old_seed = ""
+if load == True:
+    old_seed = C.get('model_to_load')
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -156,7 +161,7 @@ def main():  # vypisovat cas epizody/ epizod
         figure_file = 'plots/' + str(seed) + "/"
 
         if load:
-            agent.load_models()
+            agent.load_models(old_seed)
 
         checkpoint_steps = 0
         checkpoint_score = 0
@@ -169,7 +174,7 @@ def main():  # vypisovat cas epizody/ epizod
 
         start_time = datetime.now()
         last_timestamp = datetime.now()
-        start_log = "start: " + " seed: " + str(seed) + " timestamp: " + str(start_time) + " config: " + C.get('config_name') + "\n"
+        start_log = "start: " + " seed: " + str(seed) + " timestamp: " + str(start_time) + " mode: " + str(mode) + "\n"
         logfile.write(start_log)
         print(start_log)
 

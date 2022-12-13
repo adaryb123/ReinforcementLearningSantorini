@@ -27,9 +27,9 @@ class MinMaxBot:
             if win:
                 score = 100
             elif depth == 0:
-                score = self.evaluate(boardCopy,current_player)
+                score = self.evaluate(boardCopy, current_player)
             else:
-                score,_ = self.min(depth - 1, alpha, beta, boardCopy, next_player_moves, next_player)
+                score, _ = self.min(depth - 1, alpha, beta, boardCopy, next_player_moves, next_player)
 
             if score >= beta:
                 return beta,bestMove
@@ -50,9 +50,9 @@ class MinMaxBot:
             if win:
                 score = -100
             elif depth == 0:
-                score = -self.evaluate(boardCopy,current_player)
+                score = -self.evaluate(boardCopy, current_player)
             else:
-                score,_ = self.max(depth - 1, alpha, beta, boardCopy, next_player_moves, next_player)
+                score, _ = self.max(depth - 1, alpha, beta, boardCopy, next_player_moves, next_player)
 
             if score <= alpha:
                 return alpha,bestMove
@@ -74,7 +74,7 @@ class MinMaxBot:
         score -= board.tiles[roww1][colw1].level
         score -= board.tiles[roww2][colw2].level
 
-        if player=="black":
+        if player == "black":
             return score
         else:
             return -score

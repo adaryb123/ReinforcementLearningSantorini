@@ -7,5 +7,6 @@ class RandomBot:
         self.color = color
 
     def make_turn(self, board, availableMoves):
+        print(len(availableMoves))
         index = random.randint(0, len(availableMoves) - 1)
         return availableMoves[index]
