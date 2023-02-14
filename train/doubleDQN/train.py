@@ -8,16 +8,6 @@ from datetime import datetime
 from line_profiler_pycharm import profile
 from configs import coop_then_compet_then_compet as conf
 
-# if training a new model
-# seed = random.randint(10000, 99999)
-# seed = "200k-compet"
-# load = False
-
-# if continuing on an already trained model
-# seed = 97620
-# load = True
-
-
 C = conf.config
 n_episodes = C.get('n_episodes')
 epsilon = C.get('epsilon')
@@ -38,6 +28,8 @@ load = C.get('load')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
+
+seed = random.randint(10000, 99999)
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -67,6 +59,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     ax.set_ylabel("Epsilon", color="C0")
     ax.tick_params(axis='x', colors="C0")
     ax.tick_params(axis='y', colors="C0")
+    plt.xticks(rotation=45)
     plt.savefig(filename + "epsilon.png")
     plt.close(fig)
 
@@ -77,6 +70,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     ax2.set_ylabel('Average score', color="C1")
     ax2.tick_params(axis='x', colors="C1")
     ax2.tick_params(axis='y', colors="C1")
+    plt.xticks(rotation=45)
     plt.savefig(filename + "scores.png")
     plt.close(fig2)
 
@@ -87,6 +81,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     ax3.set_ylabel('Average steps', color="C2")
     ax3.tick_params(axis='x', colors="C2")
     ax3.tick_params(axis='y', colors="C2")
+    plt.xticks(rotation=45)
     plt.savefig(filename + "steps.png")
     plt.close(fig3)
 
@@ -117,6 +112,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     ax5.set_ylabel('Wins', color="C3")
     ax5.tick_params(axis='x', colors="C3")
     ax5.tick_params(axis='y', colors="C3")
+    plt.xticks(rotation=45)
     plt.savefig(filename + "wins.png")
     plt.close(fig5)
 

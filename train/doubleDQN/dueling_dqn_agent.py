@@ -74,14 +74,12 @@ class DuelingDQNAgent(object):
 
     # @profile
     def learn(self):
-        if self.memory.mem_cntr < self.batch_size:          # mem cntr iba na zaciatku
+        if self.memory.mem_cntr < self.batch_size:          # iba na zaciatku
             return
 
         for i in range(self.learn_amount):
 
             self.q_eval.optimizer.zero_grad()
-
-            self.replace_target_network()
 
             states, actions, rewards, states_, dones = self.sample_memory()
 
@@ -102,12 +100,13 @@ class DuelingDQNAgent(object):
             q_target = rewards + self.gamma*q_next
 
             loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
-            loss.backward()         #96 percent casu travi tu
-            #synchronne volanie cudy - cuda launch blocking
+            loss.backward()
             self.q_eval.optimizer.step()
             self.learn_step_counter += 1
 
             self.decrement_epsilon()
+
+        self.replace_target_network()
 
 
     def flip_tensor_values(self, states_):
