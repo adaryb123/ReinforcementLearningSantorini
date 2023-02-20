@@ -114,9 +114,9 @@ class DuelingDQNAgent(object):
 
         for i in range(self.learn_amount):
 
-            self.replace_target_network()
-
             self.q_eval.optimizer.zero_grad()
+
+            self.replace_target_network()
 
             states, actions, rewards, states_, dones = self.sample_memory()
 
@@ -142,8 +142,6 @@ class DuelingDQNAgent(object):
             self.learn_step_counter += 1
 
             self.decrement_epsilon()
-
-        # self.replace_target_network()
 
 
     def flip_tensor_values(self, states_):
