@@ -16,4 +16,5 @@ config = {
     'batch_size': 32,
     'replace_network_frequency': 10000,
     'eps_dec': 1e-5,
+    'invalid_moves_enabled': True,
 }

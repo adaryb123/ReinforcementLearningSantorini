@@ -4,10 +4,13 @@ from deep_q_network import DuelingDeepQNetwork
 from replay_memory import ReplayBuffer
 from line_profiler_pycharm import profile
 
+from myenv import MyEnv
+
 class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
                  mem_size, batch_size, eps_min, eps_dec,
-                 replace, learn_amount, seed=None, checkpoint_dir=None):
+                 replace, learn_amount, seed=None, checkpoint_dir=None,
+                 invalid_moves_enabled = False):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -22,6 +25,7 @@ class DuelingDQNAgent(object):
         self.learn_amount = learn_amount
         self.action_space = [i for i in range(n_actions)]
         self.learn_step_counter = 0
+        self.invalid_moves_enabled = invalid_moves_enabled
 
         self.memory = ReplayBuffer(mem_size, input_dims, n_actions)
 
@@ -49,18 +53,49 @@ class DuelingDQNAgent(object):
 
         return states, actions, rewards, states_, dones
 
+    def choose_action(self, observation, e):
+        if self.invalid_moves_enabled:
+            if np.random.random() > self.epsilon:
+                state = np.array([observation], copy=False, dtype=np.float32)  # torch
+                state_tensor = T.tensor(state).to(self.q_eval.device)
+                _, advantages = self.q_eval.forward(state_tensor)  # tu by sa dali osetrovat nemozne tahy
 
-    def choose_action(self, observation):
-        if np.random.random() > self.epsilon:
-            state = np.array([observation], copy=False, dtype=np.float32)           # torch
-            state_tensor = T.tensor(state).to(self.q_eval.device)
-            _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
+                action = T.argmax(advantages).item()
+            else:
+                action = np.random.choice(self.action_space)  # torch
 
-            action = T.argmax(advantages).item()
+            return action
+
         else:
-            action = np.random.choice(self.action_space)            #torch
+            if np.random.random() > self.epsilon:
+                state = np.array([observation], copy=False, dtype=np.float32)           # torch
+                state_tensor = T.tensor(state).to(self.q_eval.device)
+                _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
 
-        return action
+                # print(e.board)
+                for number in range(len(advantages[0])):
+                    move = e.create_move(number)
+                    valid, msg = e.check_move_valid(move, e.board)
+                    if not valid:
+                        advantages[0, number] = -np.inf
+                    # print(str(number) + "  :  " + str(move) + "  :  " + str(advantages[0,number]) + "  :  " + str(msg))
+
+                # print(advantages[0])
+                # exit(0)
+
+                action = T.argmax(advantages).item()            # mozno skusit softmax?
+            else:
+                valid_moves = []
+                for number in range(len(self.action_space)):
+                    move = e.create_move(number)
+                    valid, msg = e.check_move_valid(move, e.board)
+                    if valid:
+                        valid_moves.append(number)
+
+                action = np.random.choice(valid_moves)
+                # action = valid_moves[index]
+
+            return action
 
     def replace_target_network(self):
         if self.replace_target_cnt is not None and \
@@ -78,6 +113,8 @@ class DuelingDQNAgent(object):
             return
 
         for i in range(self.learn_amount):
+
+            self.replace_target_network()
 
             self.q_eval.optimizer.zero_grad()
 
@@ -106,7 +143,7 @@ class DuelingDQNAgent(object):
 
             self.decrement_epsilon()
 
-        self.replace_target_network()
+        # self.replace_target_network()
 
 
     def flip_tensor_values(self, states_):

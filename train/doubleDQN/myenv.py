@@ -73,6 +73,7 @@ class MyEnv(gym.Env):
 
         elif self.mode == "single":
             chosenMove = self.create_move(action)
+            # print(chosenMove)
             valid, log = self.check_move_valid(chosenMove, self.board)
             if not valid:
                 return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
@@ -169,7 +170,7 @@ class MyEnv(gym.Env):
                 move_target = board.tiles[row_to][col_to]
                 build_target = board.tiles[row_build][col_build]
                 if move_target.player == 0:
-                    if build_target.player == 0:
+                    if build_target.player == 0 or build_target == current_tile:
                         if move_target.level != 4:
                             if build_target.level != 4:
                                 if move_target.level <= current_tile.level + 1:

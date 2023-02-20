@@ -6,7 +6,7 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import coop_then_compet_then_compet as conf
+from configs import default_single as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -23,6 +23,7 @@ mem_size = C.get('memory_size')
 batch_size = C.get('batch_size')
 replace = C.get('replace_network_frequency')
 eps_dec = C.get('eps_dec')
+invalid_moves_enabled = C.get('invalid_moves_enabled')
 seed = C.get('model_name')
 load = C.get('load')
 old_seed = ""
@@ -152,7 +153,8 @@ def main():  # vypisovat cas epizody/ epizod
                                 input_dims=env.observation_space.shape,
                                 n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                                 batch_size=batch_size, replace=replace, eps_dec=eps_dec,
-                                learn_amount=learn_amount, seed=seed, checkpoint_dir='models/')
+                                learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
+                                invalid_moves_enabled=invalid_moves_enabled)
 
         figure_file = 'plots/' + str(seed) + "/"
 
@@ -186,7 +188,7 @@ def main():  # vypisovat cas epizody/ epizod
             episode_score = 0
 
             while not done:
-                action = agent.choose_action(observation)  # env by mohol poslat agentovi ktore tahy su neplatne
+                action = agent.choose_action(observation, env)  # env by mohol poslat agentovi ktore tahy su neplatne
                 observation_, reward, done, info = env.step(action)
                 last_message = info.get('message')
                 episode_score += reward
@@ -201,6 +203,8 @@ def main():  # vypisovat cas epizody/ epizod
                         "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
                     logfile.write(action_log)
                     logfile.write(env.render())
+
+            # exit(0)
 
             if episode_score > best_score:
                 best_score = episode_score
