@@ -41,14 +41,26 @@ def main():
     score = 0
     while not done:
         action = agent.choose_action(observation,env)
-        observation_, reward, done, info = env.step(action)
-        score += reward
-        action_log = "------------player: " + info.get("player") + " move: " + info.get("move") + " which is: " + info.get("valid") + ": " + info.get("message") + " reward: " + str(reward) + " score: " + str(score) + "\n"
+        observation_, reward, done, info = env.primary_player_step(action)
+        action_log = "------------player: " + info.get("player") + " move: " + info.get(
+            "move") + " which is: " + info.get("valid") + ": " + info.get("message") + " reward: " + str(
+            reward) + " score: " + str(score) + "\n"
         print(action_log)
         print(env.render())
+        n_steps += 1
+
+        if not done:
+            observation_, reward, done, info = env.secondary_player_step()
+            action_log = "------------player: " + info.get("player") + " move: " + info.get(
+                "move") + " which is: " + info.get("valid") + ": " + info.get("message") + " reward: " + str(
+                reward) + " score: " + str(score) + "\n"
+            print(action_log)
+            print(env.render())
+            n_steps += 1
 
         observation = observation_
-        n_steps += 1
+        reward = env.calculate_reward()
+        score += reward
 
     episode_log  = 'end: ' + " seed: " + str(seed) +  ' score: ' +str(score)  + ' steps ' + str(n_steps) + "\n"
     print(episode_log)

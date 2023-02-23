@@ -213,18 +213,16 @@ def main():  # vypisovat cas epizody/ epizod
                         "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
                     logfile.write(action_log)
                     logfile.write(env.render())
-                    if info_ != False:
+                    if info_:
                         action_log = "------------player: " + info_.get("player") + " move: " + info_.get(
                             "move") + " which is: " + info_.get("valid") + ": " + info_.get("message") + "\n"
                         logfile.write(action_log)
                         logfile.write(env.render())
 
-            # exit(0)
-
             if episode_score > best_score:
                 best_score = episode_score
 
-            if reward == reward_for_win:
+            if reward == env.reward_for_win:
                 checkpoint_wins += 1
                 total_wins += 1
 

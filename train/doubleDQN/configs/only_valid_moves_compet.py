@@ -8,12 +8,11 @@ config = {
     'checkpoint_every': 100,
     'learn_frequency': 100,
     'learn_amount': 100,
-    'reward_for_win': 100,
     'gamma': 0.99,
     'learning_rate': 0.0001,
     'memory_size': 50000,
     'batch_size': 32,
-    'replace_network_frequency': 10000,
+    'replace_network_frequency': 100,
     'eps_dec': 1e-5,
     'invalid_moves_enabled': False,
 }
