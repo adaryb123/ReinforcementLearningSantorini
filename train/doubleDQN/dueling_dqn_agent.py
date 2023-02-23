@@ -74,7 +74,7 @@ class DuelingDQNAgent(object):
 
                 # print(e.board)
                 for number in range(len(advantages[0])):
-                    move = e.create_move(number)
+                    move = e.create_move(number, e.primary_player_color)
                     valid, msg = e.check_move_valid(move, e.board)
                     if not valid:
                         advantages[0, number] = -np.inf
@@ -87,7 +87,7 @@ class DuelingDQNAgent(object):
             else:
                 valid_moves = []
                 for number in range(len(self.action_space)):
-                    move = e.create_move(number)
+                    move = e.create_move(number, e.primary_player_color)
                     valid, msg = e.check_move_valid(move, e.board)
                     if valid:
                         valid_moves.append(number)

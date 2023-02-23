@@ -6,7 +6,7 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import default_single as conf
+from configs import separate_player_test as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -30,7 +30,7 @@ old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-seed = random.randint(10000, 99999)
+seed = "vs_random"
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -144,8 +144,7 @@ def update_invalid_moves_over_time(total, recent):
 def main():  # vypisovat cas epizody/ epizod
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = MyEnv()
-        env.mode = mode
+        env = MyEnv(mode)
         env.reset()
         best_score = -np.inf
 
@@ -189,10 +188,21 @@ def main():  # vypisovat cas epizody/ epizod
 
             while not done:
                 action = agent.choose_action(observation, env)  # env by mohol poslat agentovi ktore tahy su neplatne
-                observation_, reward, done, info = env.step(action)
+                observation_, reward, done, info = env.primary_player_step(action)
+                info_ = False
+                if done:
+                    agent.store_transition(observation, action, reward, observation_, done)
+                else:
+                    observation_, reward, done, info_ = env.secondary_player_step()
+                    if done:
+                        agent.store_transition(observation, action, reward, observation_, done)     # nebolo by lepsie ukladat aj tah minmaxa aj rl bota do replay bufferu?
+                    else:
+                        reward = env.calculate_reward()
+                        agent.store_transition(observation, action, reward, observation_, done)
+
                 last_message = info.get('message')
                 episode_score += reward
-                agent.store_transition(observation, action, reward, observation_, int(done))
+                # agent.store_transition(observation, action, reward, observation_, done)
                 if i % learn_frequency == 0:
                     agent.learn()
                 observation = observation_
@@ -203,6 +213,11 @@ def main():  # vypisovat cas epizody/ epizod
                         "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
                     logfile.write(action_log)
                     logfile.write(env.render())
+                    if info_ != False:
+                        action_log = "------------player: " + info_.get("player") + " move: " + info_.get(
+                            "move") + " which is: " + info_.get("valid") + ": " + info_.get("message") + "\n"
+                        logfile.write(action_log)
+                        logfile.write(env.render())
 
             # exit(0)
 

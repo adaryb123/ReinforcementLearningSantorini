@@ -7,8 +7,8 @@ class MinMaxBot:
     def __init__(self, color):
         self.color = color
 
-    def make_turn(self, board, availableMoves):
-        _,move = self.max(3, -99999, 99999, board, availableMoves, self.color)
+    def make_turn(self, board, availableMoves, color):
+        _,move = self.max(1, -99999, 99999, board, availableMoves, color)
         return move
 
     def get_next_player(self,current_player):

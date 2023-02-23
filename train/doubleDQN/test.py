@@ -1,6 +1,6 @@
 from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
-from configs import only_valid_moves_compet as conf
+from configs import separate_player_test as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -21,8 +21,7 @@ invalid_moves_enabled = C.get('invalid_moves_enabled')
 seed = C.get('model_name')
 
 def main():
-    env = MyEnv()
-    env.mode = mode
+    env = MyEnv(mode)
     env.reset()
     agent = DuelingDQNAgent(gamma=gamma, epsilon=0, lr=lr,
                             input_dims=env.observation_space.shape,
