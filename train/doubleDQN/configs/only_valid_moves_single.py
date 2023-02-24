@@ -3,7 +3,7 @@ config = {
     'mode': 'single',
     'load': False,
     'n_episodes': 5000,
-    'epsilon': 1,
+    'epsilon': 0.5,
     'eps_min': 0.01,
     'checkpoint_every': 100,
     'learn_frequency': 100,

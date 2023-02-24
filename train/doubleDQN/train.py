@@ -6,7 +6,7 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import separate_player_test as conf
+from configs import only_valid_moves_single as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -15,7 +15,6 @@ eps_min = C.get('eps_min')
 checkpoint_every = C.get('checkpoint_every')
 learn_frequency = C.get('learn_frequency')
 learn_amount = C.get('learn_amount')
-reward_for_win = C.get('reward_for_win')
 mode = C.get('mode')
 gamma = C.get('gamma')
 lr = C.get('learning_rate')
@@ -30,7 +29,7 @@ old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-seed = "vs_random"
+seed = random.randint(10000,99999)
 
 def setup_output_files_directories():
     models_dir = "models"

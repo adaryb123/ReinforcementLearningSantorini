@@ -1,6 +1,6 @@
 from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
-from configs import separate_player_test as conf
+from configs import only_valid_moves_single as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -9,7 +9,6 @@ eps_min = C.get('eps_min')
 checkpoint_every = C.get('checkpoint_every')
 learn_frequency = C.get('learn_frequency')
 learn_amount = C.get('learn_amount')
-reward_for_win = C.get('reward_for_win')
 mode = C.get('mode')
 gamma = C.get('gamma')
 lr = C.get('learning_rate')
@@ -18,7 +17,8 @@ batch_size = C.get('batch_size')
 replace = C.get('replace_network_frequency')
 eps_dec = C.get('eps_dec')
 invalid_moves_enabled = C.get('invalid_moves_enabled')
-seed = C.get('model_name')
+# seed = C.get('model_name')
+seed = "61603"
 
 def main():
     env = MyEnv(mode)
