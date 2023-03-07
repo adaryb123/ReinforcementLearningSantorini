@@ -6,7 +6,8 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import only_valid_moves_single as conf
+from configs import pickle_test as conf
+import pickle
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -29,7 +30,46 @@ old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-seed = random.randint(10000,99999)
+# seed = random.randint(10000,99999)
+seed = "test2"
+
+
+class PlotItemStorage:
+    def __init__(self):
+        self.episodes_num_array = []
+        self.checkpoint_scores_array = []
+        self.checkpoint_epsilon_array = []
+        self.checkpoint_steps_array = []
+        self.checkpoint_wins_array = []
+        self.invalid_moves_over_time = [[], [], [], [], [], [], []]
+
+    def __str__(self):
+        output_string = ""
+        output_string += str(self.episodes_num_array) + "\n"
+        output_string += str(self.checkpoint_scores_array) + "\n"
+        output_string += str(self.checkpoint_epsilon_array) + "\n"
+        output_string += str(self.checkpoint_steps_array) + "\n"
+        output_string += str(self.invalid_moves_over_time) + "\n"
+        return output_string
+
+def ps_store(plot_object, seed):
+    filename = "plots/" + str(seed) + "/values.pickle"
+    if not os.path.exists(filename):
+        with open(filename, 'w') as _:
+            pass
+
+    with open(filename, "wb") as pickle_out:
+        pickle.dump(plot_object, pickle_out)
+
+def ps_load(seed):
+    filename = "plots/" + str(seed) + "/values.pickle"
+    if not os.path.exists(filename):
+        print("ERROR: no plot values to load")
+        exit(0)
+
+    with open(filename, "rb") as pickle_in:
+        return pickle.load(pickle_in)
+
 
 def setup_output_files_directories():
     models_dir = "models"
@@ -116,6 +156,7 @@ def plot_learning_curve(x, scores, epsilons, steps, invalid_moves, wins, filenam
     plt.savefig(filename + "wins.png")
     plt.close(fig5)
 
+
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
         types[0] += 1
@@ -138,6 +179,7 @@ def update_invalid_moves_over_time(total, recent):
     for i in range(len(recent)):
         total[i].append(recent[i])
     return total
+
 
 # @profile
 def main():  # vypisovat cas epizody/ epizod
@@ -163,9 +205,13 @@ def main():  # vypisovat cas epizody/ epizod
         checkpoint_score = 0
         total_wins = 0
         checkpoint_wins = 0
-        checkpoint_scores_array, checkpoint_epsilon_array, checkpoint_steps_array, episodes_num_array, checkpoint_wins_array = [], [], [], [], []
+        ps = PlotItemStorage()
+        previous_train_offset = 0
+        if load:
+            ps = ps_load(old_seed)
+            previous_train_offset = ps.episodes_num_array[-1]
+
         invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
-        invalid_moves_over_time = [[], [], [], [], [], [], []]
         last_message = ""
 
         start_time = datetime.now()
@@ -194,14 +240,14 @@ def main():  # vypisovat cas epizody/ epizod
                 else:
                     observation_, reward, done, info_ = env.secondary_player_step()
                     if done:
-                        agent.store_transition(observation, action, reward, observation_, done)     # nebolo by lepsie ukladat aj tah minmaxa aj rl bota do replay bufferu?
+                        agent.store_transition(observation, action, reward, observation_,
+                                               done)  # nebolo by lepsie ukladat aj tah minmaxa aj rl bota do replay bufferu?
                     else:
                         reward = env.calculate_reward()
                         agent.store_transition(observation, action, reward, observation_, done)
 
                 last_message = info.get('message')
                 episode_score += reward
-                # agent.store_transition(observation, action, reward, observation_, done)
                 if i % learn_frequency == 0:
                     agent.learn()
                 observation = observation_
@@ -238,20 +284,26 @@ def main():  # vypisovat cas epizody/ epizod
                 elapsed_time = datetime.now() - last_timestamp
                 last_timestamp = datetime.now()
 
-                logfile.write("\nend episode " + str(i) + " of " + str(n_episodes) + " steps: " + str(episode_steps) + " score: " + str(episode_score) + "\n")
-                episode_log = "checkpoint: " + str(i) + "/" + str(n_episodes) + " best score: " + str(best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(agent.epsilon) + "\n" + " average steps: " + str(average_steps) + " elapsed time: " + str(elapsed_time) + " wins this checkpoint: " + str(checkpoint_wins) + " total wins: " + str(total_wins) + "\n"
+                logfile.write("\nend episode " + str(i) + " of " + str(n_episodes) + " steps: " + str(
+                    episode_steps) + " score: " + str(episode_score) + "\n")
+                episode_log = "checkpoint: " + str(i) + "/" + str(n_episodes) + " best score: " + str(
+                    best_score) + " average score: " + "{:.2f}".format(average_score) + " epsilon " + "{:.2f}".format(
+                    agent.epsilon) + "\n" + " average steps: " + str(average_steps) + " elapsed time: " + str(
+                    elapsed_time) + " wins this checkpoint: " + str(checkpoint_wins) + " total wins: " + str(
+                    total_wins) + "\n"
                 logfile.write(episode_log)
                 print(episode_log)
 
-                checkpoint_scores_array.append(average_score)
-                checkpoint_steps_array.append(average_steps)
-                checkpoint_epsilon_array.append(agent.epsilon)
-                episodes_num_array.append(i)
-                checkpoint_wins_array.append(checkpoint_wins)
+                ps.checkpoint_scores_array.append(average_score)
+                ps.checkpoint_steps_array.append(average_steps)
+                ps.checkpoint_epsilon_array.append(agent.epsilon)
+                ps.episodes_num_array.append(i+previous_train_offset)
+                ps.checkpoint_wins_array.append(checkpoint_wins)
 
-                invalid_moves_over_time = update_invalid_moves_over_time(invalid_moves_over_time, invalid_move_types)
-                plot_learning_curve(episodes_num_array, checkpoint_scores_array, checkpoint_epsilon_array, checkpoint_steps_array, invalid_moves_over_time, checkpoint_wins_array, figure_file)
-
+                ps.invalid_moves_over_time = update_invalid_moves_over_time(ps.invalid_moves_over_time, invalid_move_types)
+                plot_learning_curve(ps.episodes_num_array, ps.checkpoint_scores_array, ps.checkpoint_epsilon_array,
+                                    ps.checkpoint_steps_array, ps.invalid_moves_over_time, ps.checkpoint_wins_array, figure_file)
+                ps_store(ps, seed)
                 checkpoint_steps = 0
                 checkpoint_score = 0
                 checkpoint_wins = 0
@@ -259,9 +311,11 @@ def main():  # vypisovat cas epizody/ epizod
 
         end_timestamp = datetime.now()
         end_elapsed_time = datetime.now() - start_time
-        end_log = "end: " + " seed: " + str(seed) + " timestamp " + str(end_timestamp) + " , training time: " + str(end_elapsed_time)
+        end_log = "end: " + " seed: " + str(seed) + " timestamp " + str(end_timestamp) + " , training time: " + str(
+            end_elapsed_time)
         logfile.write(end_log)
         print(end_log)
+
 
 setup_output_files_directories()
 main()

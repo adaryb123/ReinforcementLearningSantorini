@@ -58,7 +58,7 @@ class DuelingDQNAgent(object):
             if np.random.random() > self.epsilon:
                 state = np.array([observation], copy=False, dtype=np.float32)  # torch
                 state_tensor = T.tensor(state).to(self.q_eval.device)
-                _, advantages = self.q_eval.forward(state_tensor)  # tu by sa dali osetrovat nemozne tahy
+                _, advantages = self.q_eval.forward(state_tensor)
 
                 action = T.argmax(advantages).item()
             else:
@@ -70,18 +70,13 @@ class DuelingDQNAgent(object):
             if np.random.random() > self.epsilon:
                 state = np.array([observation], copy=False, dtype=np.float32)           # torch
                 state_tensor = T.tensor(state).to(self.q_eval.device)
-                _, advantages = self.q_eval.forward(state_tensor)   #tu by sa dali osetrovat nemozne tahy
+                _, advantages = self.q_eval.forward(state_tensor)
 
-                # print(e.board)
                 for number in range(len(advantages[0])):
                     move = e.create_move(number, e.primary_player_color)
                     valid, msg = e.check_move_valid(move, e.board)
                     if not valid:
                         advantages[0, number] = -np.inf
-                    # print(str(number) + "  :  " + str(move) + "  :  " + str(advantages[0,number]) + "  :  " + str(msg))
-
-                # print(advantages[0])
-                # exit(0)
 
                 action = T.argmax(advantages).item()            # mozno skusit softmax?
             else:
@@ -93,7 +88,6 @@ class DuelingDQNAgent(object):
                         valid_moves.append(number)
 
                 action = np.random.choice(valid_moves)
-                # action = valid_moves[index]
 
             return action
 

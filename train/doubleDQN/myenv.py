@@ -4,6 +4,7 @@ from engine.Board import Board
 from engine.Move import Move
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
+from ai.RLBot import RLBot
 
 class MyEnv(gym.Env):
 
@@ -13,8 +14,6 @@ class MyEnv(gym.Env):
         self.observation_space = spaces.Box(low=-1, high=5, shape=(2, 5, 5), dtype=int)
 
         self.board = Board()
-        # self.players_turn = "white"
-        # self.prev_actions = []
         self.mode = mode # cooperative or competitive or single
 
         self.reward_for_invalid_move = -100
@@ -26,18 +25,8 @@ class MyEnv(gym.Env):
         self.secondary_player_color = "black"
         # self.secondary_player = MinMaxBot(self.secondary_player_color)
         self.secondary_player = RandomBot(self.secondary_player_color)
-
-    def set_next_player(self):
-        if self.players_turn == "white":
-            self.players_turn = "black"
-        else:
-            self.players_turn = "white"
-
-    def get_prev_player(self):
-        if self.players_turn == "white":
-            return "black"
-        else:
-            return "white"
+        # self.secondary_player = RLBot(self.secondary_player_color)
+        self.bot_name = "RANDOM" # NONE/RANDOM/MINMAX/RL
 
     def primary_player_step(self, action):
         chosenMove = self.create_move(action, self.primary_player_color)
@@ -59,9 +48,15 @@ class MyEnv(gym.Env):
 
 
     def secondary_player_step(self):
-        all_moves = self.board.find_possible_moves(self.secondary_player_color)
-        chosenMove = self.secondary_player.make_turn(self.board, all_moves, self.secondary_player_color)
-        self.board.update_board_after_move(chosenMove)
+        chosenMove = ""
+        if self.bot_name == "RANDOM" or self.bot_name == "MINMAX":
+            chosenMove = self.secondary_player.make_turn(self.board)
+            self.board.update_board_after_move(chosenMove)
+        elif self.bot_name == "RL":
+            chosenMove = self.secondary_player.make_turn(self)
+            self.board.update_board_after_move(chosenMove)
+        elif self.bot_name == "NONE":
+            chosenMove = "NONE"
         end, _ = self.board.check_if_game_ended(self.secondary_player_color)
         if end:
             return self.encode_input(self.board), self.reward_for_lose, 1, {"move": chosenMove.__str__(),
@@ -80,164 +75,6 @@ class MyEnv(gym.Env):
         elif self.mode == "single":
             return self.get_player_height(self.board, self.primary_player_color)
 
-    # def step(self, action):
-    #     chosenMove = self.create_move(action)
-    #     valid, msg, win = self.primary_player_step(chosenMove)
-    #     if not valid:
-    #         if self.mode == "competitive":
-    #             return self.encode_input(self.board), -100, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "INVALID",
-    #                                                            "win": False, "message": msg}
-    #         elif self.mode == "cooperative":
-    #             return self.encode_input(self.board), 0, 1, {"move": chosenMove.__str__(),
-    #                                                          "player": self.players_turn, "valid": "INVALID",
-    #                                                          "win": False, "message": msg}
-    #         elif self.mode == "single":
-    #             return self.encode_input(self.board), -100, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "INVALID",
-    #                                                            "win": False, "message": msg}
-    #
-    #     if win:
-    #         if self.mode == "competitive":
-    #             return self.encode_input(self.board), 10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "WIN",
-    #                                                            "win": True, "message": ""}
-    #         elif self.mode == "cooperative":
-    #             return self.encode_input(self.board), 10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "WIN",
-    #                                                            "win": True, "message": ""}
-    #         elif self.mode == "single":
-    #             return self.encode_input(self.board), 10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "WIN",
-    #                                                            "win": True, "message": ""}
-    #     self.set_next_player()
-    #     secondary_player_win = self.secondary_player_step()
-    #
-    #     if secondary_player_win:
-    #         if self.mode == "competitive":
-    #             return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.get_prev_player(), "valid": "LOSE",
-    #                                                            "win": False, "message": ""}
-    #         elif self.mode == "cooperative":
-    #             return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.get_prev_player(), "valid": "LOSE",
-    #                                                            "win": False, "message": ""}
-    #         elif self.mode == "single":
-    #             return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.get_prev_player(), "valid": "LOSE",
-    #                                                            "win": False, "message": ""}
-    #
-    #     if self.mode == "competitive":
-    #         self.set_next_player()
-    #         reward = self.get_player_height_diff(self.board)  # iba jeho vysku
-    #         return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
-    #                                                           "player": self.players_turn,
-    #                                                           "valid": "VALID", "win": False, "message": ""}
-    #     elif self.mode == "cooperative":
-    #         self.set_next_player()
-    #         return self.encode_input(self.board), 1, 0, {"move": chosenMove.__str__(),
-    #                                                      "player": self.players_turn,
-    #                                                      "valid": "VALID", "win": False, "message": ""}
-    #     elif self.mode == "single":
-    #         self.set_next_player()
-    #         reward = self.get_player_height(self.board)
-    #         return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
-    #                                                           "player": self.players_turn,
-    #                                                           "valid": "VALID", "win": False, "message": ""}
-    #
-    #     print("unknown mode:" + str(self.mode))
-    #     exit(0)
-    # def primary_player_step(self,chosenMove):
-    #     valid, log = self.check_move_valid(chosenMove, self.board)
-    #     if not valid:
-    #         return False, log, False
-    #     else:
-    #         self.prev_actions.append(chosenMove)
-    #         self.board.update_board_after_move(chosenMove)
-    #         end, _ = self.board.check_if_game_ended(self.players_turn)
-    #         if end:
-    #             return True, log, True
-    #         else:
-    #             return True, log, False
-    #
-    # def secondary_player_step(self):
-    #     all_moves = self.board.find_possible_moves(self.players_turn)
-    #     chosenMove = self.secondary_player.make_turn(self.board,all_moves,self.players_turn)
-    #     self.board.update_board_after_move(chosenMove)
-    #     end, _ = self.board.check_if_game_ended(self.players_turn)
-    #     return end
-
-
-
-    # def step(self, action):
-    #     if self.mode == "competitive":
-    #         chosenMove = self.create_move(action)
-    #         valid, log = self.check_move_valid(chosenMove, self.board)
-    #         if not valid:
-    #             return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "INVALID",
-    #                                                            "win": False, "message": log}
-    #         else:
-    #             self.prev_actions.append(chosenMove)
-    #             self.board.update_board_after_move(chosenMove)
-    #             end, _ = self.board.check_if_game_ended(self.players_turn)
-    #             if end:
-    #                 return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
-    #                                                                "player": self.players_turn, "valid": "WIN",
-    #                                                                "win": True, "message": ""}
-    #             else:
-    #                 reward = self.get_player_height_diff(self.board)  # iba jeho vysku
-    #                 self.set_next_player()
-    #                 return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
-    #                                                                   "player": self.get_prev_player(),
-    #                                                                   "valid": "VALID", "win": False, "message": ""}
-    #
-    #     elif self.mode == "cooperative":
-    #         chosenMove = self.create_move(action)
-    #         valid, log = self.check_move_valid(chosenMove, self.board)
-    #         if not valid:
-    #             return self.encode_input(self.board), 0, 1, {"move": chosenMove.__str__(),
-    #                                                          "player": self.players_turn, "valid": "INVALID",
-    #                                                          "win": False, "message": log}
-    #         else:
-    #             self.prev_actions.append(chosenMove)
-    #             self.board.update_board_after_move(chosenMove)
-    #             end, _ = self.board.check_if_game_ended(self.players_turn)
-    #             if end:
-    #                 return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
-    #                                                                "player": self.players_turn, "valid": "WIN",
-    #                                                                "win": True, "message": ""}
-    #             else:
-    #                 self.set_next_player()
-    #                 return self.encode_input(self.board), 1, 0, {"move": chosenMove.__str__(),
-    #                                                              "player": self.get_prev_player(),
-    #                                                              "valid": "VALID", "win": False, "message": ""}
-    #
-    #     elif self.mode == "single":
-    #         chosenMove = self.create_move(action)
-    #         # print(chosenMove)
-    #         valid, log = self.check_move_valid(chosenMove, self.board)
-    #         if not valid:
-    #             return self.encode_input(self.board), -10, 1, {"move": chosenMove.__str__(),
-    #                                                            "player": self.players_turn, "valid": "INVALID",
-    #                                                            "win": False, "message": log}
-    #         else:
-    #             self.prev_actions.append(chosenMove)
-    #             self.board.update_board_after_move(chosenMove)
-    #             end, _ = self.board.check_if_game_ended(self.players_turn)
-    #             if end:
-    #                 return self.encode_input(self.board), 100, 1, {"move": chosenMove.__str__(),
-    #                                                                "player": self.players_turn, "valid": "WIN",
-    #                                                                "win": True, "message": ""}
-    #             else:
-    #                 reward = self.get_player_height(self.board)
-    #                 self.set_next_player()
-    #                 return self.encode_input(self.board), reward, 0, {"move": chosenMove.__str__(),
-    #                                                                   "player": self.get_prev_player(),
-    #                                                                   "valid": "VALID", "win": False, "message": ""}
-    #     else:
-    #         print("unknown mode:"+str(self.mode))
-    #         exit(0)
 
     def get_player_height_diff(self, board, player_color):
         height_diff = 0
@@ -266,8 +103,6 @@ class MyEnv(gym.Env):
 
     def reset(self):
         self.board = Board()
-        # self.prev_actions = []
-        # self.players_turn = "white"
         return self.encode_input(self.board)
 
     def encode_input(self, board):
