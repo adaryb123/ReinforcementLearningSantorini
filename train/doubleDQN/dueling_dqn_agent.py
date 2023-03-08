@@ -72,6 +72,7 @@ class DuelingDQNAgent(object):
                 state_tensor = T.tensor(state).to(self.q_eval.device)
                 _, advantages = self.q_eval.forward(state_tensor)
 
+                # print(advantages)
                 for number in range(len(advantages[0])):
                     move = e.create_move(number, e.primary_player_color)
                     valid, msg = e.check_move_valid(move, e.board)
@@ -79,6 +80,8 @@ class DuelingDQNAgent(object):
                         advantages[0, number] = -np.inf
 
                 action = T.argmax(advantages).item()            # mozno skusit softmax?
+                # print(action)
+                # print(advantages)
             else:
                 valid_moves = []
                 for number in range(len(self.action_space)):

@@ -18,7 +18,8 @@ replace = C.get('replace_network_frequency')
 eps_dec = C.get('eps_dec')
 invalid_moves_enabled = C.get('invalid_moves_enabled')
 # seed = C.get('model_name')
-seed = "61603"
+# seed = "61603"
+seed = "test-only-valid-moves"
 
 def main():
     env = MyEnv(mode)

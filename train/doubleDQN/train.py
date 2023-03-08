@@ -6,7 +6,7 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import pickle_test as conf
+from configs import only_valid_moves_single as conf
 import pickle
 
 C = conf.config
@@ -31,7 +31,7 @@ if load == True:
     old_seed = C.get('model_to_load')
 
 # seed = random.randint(10000,99999)
-seed = "test2"
+seed = "test-only-valid-moves"
 
 
 class PlotItemStorage:
@@ -229,7 +229,7 @@ def main():  # vypisovat cas epizody/ epizod
                 logfile.write(env.render())
 
             episode_steps = 0
-            episode_score = 0
+            episode_score = -np.inf
 
             while not done:
                 action = agent.choose_action(observation, env)  # env by mohol poslat agentovi ktore tahy su neplatne
@@ -240,14 +240,15 @@ def main():  # vypisovat cas epizody/ epizod
                 else:
                     observation_, reward, done, info_ = env.secondary_player_step()
                     if done:
-                        agent.store_transition(observation, action, reward, observation_,
-                                               done)  # nebolo by lepsie ukladat aj tah minmaxa aj rl bota do replay bufferu?
+                        pass
+                        # agent.store_transition(observation, action, reward, observation_, done)  # nebolo by lepsie ukladat aj tah minmaxa aj rl bota do replay bufferu?
                     else:
                         reward = env.calculate_reward()
                         agent.store_transition(observation, action, reward, observation_, done)
 
                 last_message = info.get('message')
-                episode_score += reward
+                # episode_score += reward
+
                 if i % learn_frequency == 0:
                     agent.learn()
                 observation = observation_
@@ -263,6 +264,12 @@ def main():  # vypisovat cas epizody/ epizod
                             "move") + " which is: " + info_.get("valid") + ": " + info_.get("message") + "\n"
                         logfile.write(action_log)
                         logfile.write(env.render())
+                    logfile.write("primary player reward: " + str(reward) + "\n")
+
+            # if episode_score > best_score:
+                # best_score = episode_score
+            if reward > episode_score:
+                episode_score = reward
 
             if episode_score > best_score:
                 best_score = episode_score

@@ -24,9 +24,9 @@ class MyEnv(gym.Env):
         self.primary_player_color = "white"
         self.secondary_player_color = "black"
         # self.secondary_player = MinMaxBot(self.secondary_player_color)
-        self.secondary_player = RandomBot(self.secondary_player_color)
+        # self.secondary_player = RandomBot(self.secondary_player_color)
         # self.secondary_player = RLBot(self.secondary_player_color)
-        self.bot_name = "RANDOM" # NONE/RANDOM/MINMAX/RL
+        self.bot_name = "NONE" # NONE/RANDOM/MINMAX/RL
 
     def primary_player_step(self, action):
         chosenMove = self.create_move(action, self.primary_player_color)
@@ -93,11 +93,12 @@ class MyEnv(gym.Env):
         height = 0
         for i in range(5):
             for j in range(5):
-                if board.tiles[i][j].player >= 1:
-                    height += board.tiles[i][j].level
-
-        if player_color == "black":
-            height *= -1
+                if player_color == "white":
+                    if board.tiles[i][j].player >= 1:
+                        height += board.tiles[i][j].level
+                elif player_color == "black":
+                    if board.tiles[i][j].player <= -1:
+                        height += board.tiles[i][j].level
 
         return height
 
