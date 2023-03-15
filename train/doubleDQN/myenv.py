@@ -10,7 +10,7 @@ import copy
 
 class MyEnv(gym.Env):
 
-    def __init__(self, mode, seed, opponent, checkpoint_frequency):
+    def __init__(self, mode, seed, bot_name, checkpoint_frequency):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
         self.observation_space = spaces.Box(low=-1, high=5, shape=(2, 5, 5), dtype=int)
@@ -25,7 +25,7 @@ class MyEnv(gym.Env):
 
         self.primary_player_color = "white"
         self.secondary_player_color = "black"
-        self.bot_name = self.opponent
+        self.bot_name = bot_name
         self.secondary_player = "NONE"
         if self.bot_name == "RANDOM":
             self.secondary_player = RandomBot(self.secondary_player_color)
