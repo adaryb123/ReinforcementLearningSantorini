@@ -72,16 +72,13 @@ class DuelingDQNAgent(object):
                 state_tensor = T.tensor(state).to(self.q_eval.device)
                 _, advantages = self.q_eval.forward(state_tensor)
 
-                # print(advantages)
                 for number in range(len(advantages[0])):
                     move = e.create_move(number, e.primary_player_color)
                     valid, msg = e.check_move_valid(move, e.board)
                     if not valid:
                         advantages[0, number] = -np.inf
 
-                action = T.argmax(advantages).item()            # mozno skusit softmax?
-                # print(action)
-                # print(advantages)
+                action = T.argmax(advantages).item()
             else:
                 valid_moves = []
                 for number in range(len(self.action_space)):
@@ -121,7 +118,7 @@ class DuelingDQNAgent(object):
 
             states_ = self.flip_tensor_values(states_)
 
-            V_s_, A_s_ = self.q_next.forward(states_)
+            V_s_, A_s_ = self.q_next.forward(states_)        # pridat rovnaky cyklus ako hore mozno
 
             indices = T.arange(self.batch_size)
 
@@ -151,3 +148,5 @@ class DuelingDQNAgent(object):
     def load_models(self, old_seed):
         self.q_eval.load_checkpoint(self.chkpt_dir + old_seed + "_q_eval")
         self.q_next.load_checkpoint(self.chkpt_dir + old_seed + "_q_next")
+        print(self.chkpt_dir + old_seed + "_q_eval + loaded")
+        print(self.chkpt_dir + old_seed + "_q_next + loaded")

@@ -17,12 +17,13 @@ batch_size = C.get('batch_size')
 replace = C.get('replace_network_frequency')
 eps_dec = C.get('eps_dec')
 invalid_moves_enabled = C.get('invalid_moves_enabled')
-# seed = C.get('model_name')
+opponent = C.get('opponent')
+seed = C.get('model_name')
 # seed = "61603"
-seed = "test-only-valid-moves"
+# seed = "test-only-valid-moves"
 
 def main():
-    env = MyEnv(mode)
+    env = MyEnv(mode, seed, opponent, checkpoint_every)
     env.reset()
     agent = DuelingDQNAgent(gamma=gamma, epsilon=0, lr=lr,
                             input_dims=env.observation_space.shape,

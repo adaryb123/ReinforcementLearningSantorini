@@ -6,7 +6,7 @@ import os
 import random
 from datetime import datetime
 from line_profiler_pycharm import profile
-from configs import only_valid_moves_single as conf
+from configs import learning_rate_invalid_smaller_03 as conf
 import pickle
 
 C = conf.config
@@ -26,12 +26,13 @@ eps_dec = C.get('eps_dec')
 invalid_moves_enabled = C.get('invalid_moves_enabled')
 seed = C.get('model_name')
 load = C.get('load')
+opponent = C.get('opponent')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
 # seed = random.randint(10000,99999)
-seed = "test-only-valid-moves"
+# seed = "test-RL-secondary"
 
 
 class PlotItemStorage:
@@ -185,7 +186,7 @@ def update_invalid_moves_over_time(total, recent):
 def main():  # vypisovat cas epizody/ epizod
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = MyEnv(mode)
+        env = MyEnv(mode, seed, opponent, checkpoint_every)
         env.reset()
         best_score = -np.inf
 

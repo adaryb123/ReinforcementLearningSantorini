@@ -2,19 +2,21 @@ import gym
 from gym import spaces
 from engine.Board import Board
 from engine.Move import Move
+from RLBot import RLBot
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
-from ai.RLBot import RLBot
+import copy
+
 
 class MyEnv(gym.Env):
 
-    def __init__(self, mode = "cooperative"):
+    def __init__(self, mode, seed, opponent, checkpoint_frequency):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
         self.observation_space = spaces.Box(low=-1, high=5, shape=(2, 5, 5), dtype=int)
 
         self.board = Board()
-        self.mode = mode # cooperative or competitive or single
+        self.mode = mode # cooperative or competitive or single or single_lookback
 
         self.reward_for_invalid_move = -100
         self.reward_for_valid_move = 1
@@ -23,12 +25,22 @@ class MyEnv(gym.Env):
 
         self.primary_player_color = "white"
         self.secondary_player_color = "black"
-        # self.secondary_player = MinMaxBot(self.secondary_player_color)
-        # self.secondary_player = RandomBot(self.secondary_player_color)
-        # self.secondary_player = RLBot(self.secondary_player_color)
-        self.bot_name = "NONE" # NONE/RANDOM/MINMAX/RL
+        self.bot_name = self.opponent
+        self.secondary_player = "NONE"
+        if self.bot_name == "RANDOM":
+            self.secondary_player = RandomBot(self.secondary_player_color)
+        elif self.bot_name == "MINMAX":
+            self.secondary_player = MinMaxBot(self.secondary_player_color)
+        elif self.bot_name == "RL":
+            self.secondary_player = RLBot(self.secondary_player_color, self.observation_space.shape,
+                                          self.action_space.n, seed, checkpoint_frequency)
+        if self.mode == "single_lookback":
+            self.last_board = copy.deepcopy(self.board)
 
     def primary_player_step(self, action):
+        if self.mode == "single_lookback":
+            self.last_board = copy.deepcopy(self.board)
+
         chosenMove = self.create_move(action, self.primary_player_color)
         valid, msg = self.check_move_valid(chosenMove, self.board)
         if not valid:
@@ -74,6 +86,8 @@ class MyEnv(gym.Env):
             return self.get_player_height_diff(self.board, self.primary_player_color)
         elif self.mode == "single":
             return self.get_player_height(self.board, self.primary_player_color)
+        elif self.mode == "single_lookback":
+            return self.get_player_height_change(self.board, self.last_board, self.primary_player_color)
 
 
     def get_player_height_diff(self, board, player_color):
@@ -102,6 +116,10 @@ class MyEnv(gym.Env):
 
         return height
 
+    def get_player_height_change(self, new_board, prev_board, player_color):
+        return self.get_player_height(new_board,player_color) - self.get_player_height(prev_board,player_color)
+
+
     def reset(self):
         self.board = Board()
         return self.encode_input(self.board)
@@ -118,10 +136,6 @@ class MyEnv(gym.Env):
             for j in i:
                 row_heights.append(j.level)
                 row_players.append(j.player)
-                # if self.players_turn == "white":
-                #     row_players.append(j.player)
-                # else:
-                #     row_players.append(-j.player)
 
             board_heights.append(row_heights)
             board_players.append(row_players)
