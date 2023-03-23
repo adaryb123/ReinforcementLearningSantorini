@@ -1,4 +1,4 @@
-from engine.Board import Board
+from engine.Board import Board, encode_board
 from engine.Move import Move
 import numpy as np
 import torch as T
@@ -32,18 +32,18 @@ class RLBot:
             self.reload_network()
         self.counter += 1
 
-        observation = environment.encode_input(environment.board)
+        observation = environment.encode_board(environment.board)
         state = np.array([observation], copy=False, dtype=np.float32)  # torch
         state_tensor = T.tensor(self.flip_tensor_values(state)).to(self.q_eval.device)
         _, advantages = self.q_eval.forward(state_tensor)
 
         for number in range(len(advantages[0])):
-            move = environment.create_move(number, self.color)
-            valid, msg = environment.check_move_valid(move, environment.board)
+            # move = environment.board.create_move_from_number(number, self.color)
+            # valid, msg = environment.board.check_move_valid(move)
             if not valid:
                 advantages[0, number] = -np.inf
 
         action = T.argmax(advantages).item()
-        move = environment.create_move(action, self.color)
+        move = environment.create_move_from_number(action, self.color)
 
         return move

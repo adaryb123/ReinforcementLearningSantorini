@@ -35,7 +35,7 @@ while True:
     print(game_board)
     print("black picked move: " + move.__str__())
     print("thinking time: "+str(thinking_time.seconds))
-    game_end, white_moves = game_board.check_if_game_ended("black")
+    game_end, white_moves = game_board.check_if_player_won("black")
     if game_end:
         print("black won!")
         print("total thinking time:" + str(total_thinking_time))
@@ -58,7 +58,7 @@ while True:
     print(game_board)
     print("white picked move: " + move.__str__())
     print("thinking time: " + str(thinking_time.seconds))
-    game_end, black_moves = game_board.check_if_game_ended("white")
+    game_end, black_moves = game_board.check_if_player_won("white")
     if game_end:
         print("white won!")
         print("total thinking time:" +str(total_thinking_time))

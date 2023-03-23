@@ -1,6 +1,6 @@
 from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
-from configs import only_valid_moves_single as conf
+from configs import invalid_vs_none_then_minmax as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -21,6 +21,8 @@ opponent = C.get('opponent')
 seed = C.get('model_name')
 # seed = "61603"
 # seed = "test-only-valid-moves"
+
+invalid_moves_enabled = False
 
 def main():
     env = MyEnv(mode, seed, opponent, checkpoint_every)

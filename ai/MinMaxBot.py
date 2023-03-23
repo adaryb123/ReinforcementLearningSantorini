@@ -7,8 +7,9 @@ class MinMaxBot:
     def __init__(self, color):
         self.color = color
 
-    def make_turn(self, board):
-        availableMoves = board.find_possible_moves(self.color)
+    def make_turn(self, board, availableMoves=None):
+        if availableMoves is None:
+            availableMoves = board.find_possible_moves(self.color)
         _,move = self.max(1, -99999, 99999, board, availableMoves, self.color)
         return move
 
@@ -24,7 +25,7 @@ class MinMaxBot:
         for move in available_moves:
             boardCopy = copy.deepcopy(current_board)
             boardCopy.update_board_after_move(move)
-            win, next_player_moves = boardCopy.check_if_game_ended(current_player)
+            win, next_player_moves = boardCopy.check_if_player_won(current_player)
             if win:
                 score = 100
             elif depth == 0:
@@ -47,7 +48,7 @@ class MinMaxBot:
         for move in available_moves:
             boardCopy = copy.deepcopy(current_board)
             boardCopy.update_board_after_move(move)
-            win, next_player_moves = boardCopy.check_if_game_ended(current_player)
+            win, next_player_moves = boardCopy.check_if_player_won(current_player)
             if win:
                 score = -100
             elif depth == 0:
