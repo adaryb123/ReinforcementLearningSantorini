@@ -32,13 +32,13 @@ class RLBot:
             self.reload_network()
         self.counter += 1
 
-        observation = environment.encode_board(environment.board)
+        observation = encode_board(env.board)
         state = np.array([observation], copy=False, dtype=np.float32)  # torch
         state_tensor = T.tensor(self.flip_tensor_values(state)).to(self.q_eval.device)
         _, advantages = self.q_eval.forward(state_tensor)
 
         for action in range(len(advantages[0])):
-            move = env.board.create_move_from_number(action, env.primary_player_color)
+            move = env.board.create_move_from_number(action, env.secondary_player_color)
             valid, msg = env.board.check_move_valid(move)
             if not valid:
                 advantages[0, action] = -np.inf

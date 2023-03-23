@@ -9,7 +9,7 @@ from line_profiler_pycharm import profile
 import pickle
 from utils import *
 
-from configs import valid_vs_none as conf
+from configs import invalid_vs_rl as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -34,9 +34,7 @@ if load == True:
     old_seed = C.get('model_to_load')
 
 # seed = random.randint(10000,99999)
-# seed = "test-RL-secondary"
-# seed = "test-after-refactor"
-seed = "yyy"
+
 
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
@@ -117,6 +115,13 @@ def main():
 
             episode_steps = 0
             episode_score = -np.inf
+
+            if random.randrange(100) < 50:      #black starts with 50% chance
+                observation_, reward, done, info = env.secondary_player_step()
+                if i % checkpoint_every == 0:
+                    log_move(info, logfile, env)
+                observation = observation_
+
 
             while not done:
                 action = agent.choose_action(observation, env)
