@@ -62,11 +62,11 @@ class DuelingDQNAgent(object):
                 state_tensor = T.tensor(state).to(self.q_eval.device)
                 _, advantages = self.q_eval.forward(state_tensor)
 
-                action = T.argmax(advantages).item()
+                best_action = T.argmax(advantages).item()
             else:
-                action = np.random.choice(self.action_space)  # torch
+                best_action = np.random.choice(self.action_space)  # torch
 
-            return action
+            return best_action
 
         else:
             if np.random.random() > self.epsilon:
@@ -74,24 +74,24 @@ class DuelingDQNAgent(object):
                 state_tensor = T.tensor(state).to(self.q_eval.device)
                 _, advantages = self.q_eval.forward(state_tensor)
 
-                for number in range(len(advantages[0])):
-                    move = e.board.create_move_from_number(number, e.primary_player_color)
+                for action in range(len(advantages[0])):
+                    move = e.board.create_move_from_number(action, e.primary_player_color)
                     valid, msg = e.board.check_move_valid(move)
                     if not valid:
-                        advantages[0, number] = -np.inf
+                        advantages[0, action] = -np.inf
 
-                action = T.argmax(advantages).item()
+                best_action = T.argmax(advantages).item()
             else:
                 valid_moves = []
-                for number in range(len(self.action_space)):
-                    move = e.board.create_move_from_number(number, e.primary_player_color)
+                for action in range(len(self.action_space)):
+                    move = e.board.create_move_from_number(action, e.primary_player_color)
                     valid, msg = e.board.check_move_valid(move)
                     if valid:
-                        valid_moves.append(number)
+                        valid_moves.append(action)
 
-                action = np.random.choice(valid_moves)
+                best_action = np.random.choice(valid_moves)
 
-            return action
+            return best_action
 
     def replace_target_network(self):
         if self.replace_target_cnt is not None and \
@@ -120,18 +120,14 @@ class DuelingDQNAgent(object):
 
             V_s_, A_s_ = self.q_next.forward(states_)  # pridat rovnaky cyklus ako hore mozno
 
-            print(A_s_)
             if not self.invalid_moves_enabled:
-                for number in range(len(A_s_)):
-                    board = decode_board(states_[number])               #TODO
-                    for i in range(128):
-                        move = board.create_move_from_number(i, "white")
+                for advantage in range(len(A_s_)):
+                    board = decode_board(states_[advantage])
+                    for action in range(len(A_s_[0])):
+                        move = board.create_move_from_number(action, "white")
                         valid, msg = board.check_move_valid(move)
                         if not valid:
-                            A_s_[number, i] = -np.inf
-
-            print(A_s_)
-            exit(0)
+                            A_s_[advantage, action] = -np.inf
 
             indices = T.arange(self.batch_size)
 

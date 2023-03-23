@@ -26,7 +26,7 @@ class RLBot:
     def flip_tensor_values(self, states):
         states[:, 1, :, :] *= -1
         return states
-    def make_turn(self, environment):
+    def make_turn(self, env):
 
         if self.counter % self.checkpoint_frequency == 0:
             self.reload_network()
@@ -37,13 +37,13 @@ class RLBot:
         state_tensor = T.tensor(self.flip_tensor_values(state)).to(self.q_eval.device)
         _, advantages = self.q_eval.forward(state_tensor)
 
-        for number in range(len(advantages[0])):
-            # move = environment.board.create_move_from_number(number, self.color)
-            # valid, msg = environment.board.check_move_valid(move)
+        for action in range(len(advantages[0])):
+            move = env.board.create_move_from_number(action, env.primary_player_color)
+            valid, msg = env.board.check_move_valid(move)
             if not valid:
-                advantages[0, number] = -np.inf
+                advantages[0, action] = -np.inf
 
-        action = T.argmax(advantages).item()
-        move = environment.create_move_from_number(action, self.color)
+        best_action = T.argmax(advantages).item()
+        move = env.board.create_move_from_number(best_action, self.color)
 
         return move
