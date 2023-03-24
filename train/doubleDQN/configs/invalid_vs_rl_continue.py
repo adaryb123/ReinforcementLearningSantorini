@@ -1,10 +1,10 @@
 config = {
-    'model_name': 'invalid_vs_rl',
+    'model_name': 'invalid_vs_rl_continue',
     'mode': 'single',   # single, competitive, cooperative, single_lookback
     'load': True,      # true if loading a previously trained model
-    'model_to_load': 'invalid_vs_none_then_minmax_continue',
+    'model_to_load': 'invalid_vs_rl',
     'n_episodes': 100000,        #default is 5000 for invalid_moves_disabled
-    'epsilon': 0.5,       # 0.01 if loading a model (usually), 0.5is default for invalid_moves_disabled
+    'epsilon': 0.01,       # 0.01 if loading a model (usually), 0.5is default for invalid_moves_disabled
     'eps_min': 0.01,
     'checkpoint_every': 1000,   # default is 100 for invalid_moves_disabled
     'learn_frequency': 100,     # default is 100 for invalid_moves_disabled

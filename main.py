@@ -7,7 +7,7 @@ from datetime import datetime
 
 game_board = Board()
 white_moves = []
-black_moves = game_board.find_possible_moves("black")
+black_moves, _ = game_board.find_possible_moves("black")
 
 blackBot = MinMaxBot("black")
 whiteBot = MinMaxBot("white")

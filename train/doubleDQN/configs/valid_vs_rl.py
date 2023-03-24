@@ -1,7 +1,7 @@
 config = {
     'model_name': 'valid_vs_none',
     'mode': 'single',   # single, competitive, cooperative, single_lookback
-    'load': False,      # true if loading a previously trained model
+    'load': True,      # true if loading a previously trained model
     'model_to_load': 'invalid_vs_none',
      'n_episodes': 5000,        #default is 5000 for invalid_moves_disabled
     'epsilon': 0.5,       # 0.01 if loading a model (usually), 0.5is default for invalid_moves_disabled

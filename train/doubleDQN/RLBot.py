@@ -1,4 +1,4 @@
-from engine.Board import Board, encode_board
+from engine.Board import Board
 from engine.Move import Move
 import numpy as np
 import torch as T
@@ -26,24 +26,22 @@ class RLBot:
     def flip_tensor_values(self, states):
         states[:, 1, :, :] *= -1
         return states
-    def make_turn(self, env):
+    def make_turn(self, board):
 
-        if self.counter % self.checkpoint_frequency == 0:
-            self.reload_network()
-        self.counter += 1
+        # if self.counter % self.checkpoint_frequency == 0:
+        #     self.reload_network()
+        # self.counter += 1
 
-        observation = encode_board(env.board)
+        observation = board.encode()
         state = np.array([observation], copy=False, dtype=np.float32)  # torch
         state_tensor = T.tensor(self.flip_tensor_values(state)).to(self.q_eval.device)
         _, advantages = self.q_eval.forward(state_tensor)
 
-        for action in range(len(advantages[0])):
-            move = env.board.create_move_from_number(action, env.secondary_player_color)
-            valid, msg = env.board.check_move_valid(move)
-            if not valid:
-                advantages[0, action] = -np.inf
-
-        best_action = T.argmax(advantages).item()
-        move = env.board.create_move_from_number(best_action, self.color)
+        _, valid_actions = board.find_possible_moves(self.color)
+        valid_advantages = T.full((1, 128), -np.inf)
+        for i in valid_actions:
+            valid_advantages[0,i] = advantages[0,i]
+        best_action = T.argmax(valid_advantages).item()
+        move = board.create_move_from_number(best_action, self.color)
 
         return move

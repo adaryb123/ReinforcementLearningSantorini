@@ -9,7 +9,7 @@ class MinMaxBot:
 
     def make_turn(self, board, availableMoves=None):
         if availableMoves is None:
-            availableMoves = board.find_possible_moves(self.color)
+            availableMoves, _ = board.find_possible_moves(self.color)
         _,move = self.max(1, -99999, 99999, board, availableMoves, self.color)
         return move
 

@@ -3,7 +3,7 @@ import torch as T
 from deep_q_network import DuelingDeepQNetwork
 from replay_memory import ReplayBuffer
 from line_profiler_pycharm import profile
-from engine.Board import Board, decode_board
+from engine.Board import Board
 from myenv import MyEnv
 
 
@@ -11,7 +11,7 @@ class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
                  mem_size, batch_size, eps_min, eps_dec,
                  replace, learn_amount, seed=None, checkpoint_dir=None,
-                 invalid_moves_enabled=False):
+                 invalid_moves_enabled=False, color="white"):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -38,6 +38,8 @@ class DuelingDQNAgent(object):
                                           input_dims=self.input_dims,
                                           name=str(self.seed) + '_q_next',
                                           chkpt_dir=self.chkpt_dir)
+
+        self.color = color
 
     def store_transition(self, state, action, reward, state_, done):
         self.memory.store_transition(state, action, reward, state_, done)
@@ -74,22 +76,14 @@ class DuelingDQNAgent(object):
                 state_tensor = T.tensor(state).to(self.q_eval.device)
                 _, advantages = self.q_eval.forward(state_tensor)
 
-                for action in range(len(advantages[0])):
-                    move = e.board.create_move_from_number(action, e.primary_player_color)
-                    valid, msg = e.board.check_move_valid(move)
-                    if not valid:
-                        advantages[0, action] = -np.inf
-
-                best_action = T.argmax(advantages).item()
+                _, valid_actions = e.board.find_possible_moves(self.color)
+                valid_advantages = T.full((1,128), -np.inf)
+                for i in valid_actions:
+                    valid_advantages[0,i] = advantages[0, i]
+                best_action = T.argmax(valid_advantages).item()
             else:
-                valid_moves = []
-                for action in range(len(self.action_space)):
-                    move = e.board.create_move_from_number(action, e.primary_player_color)
-                    valid, msg = e.board.check_move_valid(move)
-                    if valid:
-                        valid_moves.append(action)
-
-                best_action = np.random.choice(valid_moves)
+                _, valid_actions = e.board.find_possible_moves(self.color)
+                best_action = np.random.choice(valid_actions)
 
             return best_action
 
@@ -114,20 +108,20 @@ class DuelingDQNAgent(object):
 
             states, actions, rewards, states_, dones = self.sample_memory()
 
-            V_s, A_s = self.q_eval.forward(states)  # pridat rovnaky cyklus ako hore mozno
+            V_s, A_s = self.q_eval.forward(states)
 
             states_ = self.flip_tensor_values(states_)
 
-            V_s_, A_s_ = self.q_next.forward(states_)  # pridat rovnaky cyklus ako hore mozno
+            V_s_, A_s_ = self.q_next.forward(states_)
 
             if not self.invalid_moves_enabled:
                 for advantage in range(len(A_s_)):
-                    board = decode_board(states_[advantage])
-                    for action in range(len(A_s_[0])):
-                        move = board.create_move_from_number(action, "white")
-                        valid, msg = board.check_move_valid(move)
-                        if not valid:
-                            A_s_[advantage, action] = -np.inf
+                    board = Board(states_[advantage])
+                    _, valid_actions = board.find_possible_moves(self.color)
+                    valid_advantages = T.full((1, 128), -np.inf)
+                    for i in valid_actions:
+                        valid_advantages[0, i] = A_s_[advantage, i]
+                    A_s_[advantage] = valid_advantages
 
             indices = T.arange(self.batch_size)
 
