@@ -1,4 +1,6 @@
 from engine.Board import Board
+from engine.Move import Move
+from engine.Tile import Tile
 from ai.RandomBot import RandomBot
 from ai.MinMaxBot import MinMaxBot
 from datetime import datetime
@@ -7,8 +9,8 @@ game_board = Board()
 white_moves = []
 black_moves, _ = game_board.find_possible_moves("black")
 
-blackBot = MinMaxBot("black",1)
-whiteBot = MinMaxBot("white",1)
+blackBot = MinMaxBot("black")
+whiteBot = MinMaxBot("white")
 # blackBot = RandomBot("black")
 # whiteBot = RandomBot("white")
 
@@ -31,7 +33,7 @@ while True:
     moves += 1
     game_board.update_board_after_move(move)
     print(game_board)
-    print("black picked move: " + game_board.move_to_string(move))
+    print("black picked move: " + move.__str__())
     print("thinking time: "+str(thinking_time.seconds))
     game_end, white_moves = game_board.check_if_player_won("black")
     if game_end:
@@ -54,7 +56,7 @@ while True:
     moves += 1
     game_board.update_board_after_move(move)
     print(game_board)
-    print("white picked move: " + game_board.move_to_string(move))
+    print("white picked move: " + move.__str__())
     print("thinking time: " + str(thinking_time.seconds))
     game_end, black_moves = game_board.check_if_player_won("white")
     if game_end:

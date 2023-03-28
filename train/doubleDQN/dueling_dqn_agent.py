@@ -102,7 +102,6 @@ class DuelingDQNAgent(object):
             return
 
         for i in range(self.learn_amount):
-
             self.q_eval.optimizer.zero_grad()
 
             self.replace_target_network()
@@ -127,12 +126,12 @@ class DuelingDQNAgent(object):
             indices = T.arange(self.batch_size)
 
             q_pred = T.add(V_s,
-                            (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]        # ja mozem hrat nahodne
+                           (A_s - A_s.mean(dim=1, keepdim=True)))[indices, actions]  # ja mozem hrat nahodne
             q_next = T.add(V_s_,
-                            (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]          #super predpokladame ze hra optimalne
+                           (A_s_ - A_s_.mean(dim=1, keepdim=True))).max(dim=1)[0]  # super predpokladame ze hra optimalne
 
             q_next[dones] = 0.0
-            q_target = rewards + self.gamma*q_next
+            q_target = rewards + self.gamma * q_next
 
             loss = self.q_eval.loss(q_target, q_pred).to(self.q_eval.device)
             loss.backward()

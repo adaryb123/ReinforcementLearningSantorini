@@ -1,10 +1,10 @@
 import gym
 from gym import spaces
 from engine.Board import Board
+from engine.Move import Move
 from RLBot import RLBot
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
-from ai.HeuristicBot import HeuristicBot
 import copy
 
 
@@ -30,12 +30,10 @@ class MyEnv(gym.Env):
         if self.bot_name == "RANDOM":
             self.secondary_player = RandomBot(self.secondary_player_color)
         elif self.bot_name == "MINMAX":
-            self.secondary_player = MinMaxBot(self.secondary_player_color,1)
+            self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
             self.secondary_player = RLBot(self.secondary_player_color, self.observation_space.shape,
                                           self.action_space.n, seed, checkpoint_frequency)
-        elif self.bot_name == "HEURISTIC":
-            self.secondary_player = HeuristicBot(self.secondary_player_color)
         if self.mode == "single_lookback":
             self.last_board = copy.deepcopy(self.board)
 
@@ -46,12 +44,12 @@ class MyEnv(gym.Env):
         chosenMove = self.board.create_move_from_number(action, self.primary_player_color)
         valid, msg = self.board.check_move_valid(chosenMove)
         if not valid:
-            return self.board.encode(), self.reward_for_invalid_move, 1, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), self.reward_for_invalid_move, 1, {"move": chosenMove.__str__(),
                                                                "player": self.primary_player_color, "valid": "INVALID",
                                                                "win": False, "message": msg}
         valid, msg = self.board.check_build_valid(chosenMove)
         if not valid:
-            return self.board.encode(), self.reward_for_invalid_move, 1, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), self.reward_for_invalid_move, 1, {"move": chosenMove.__str__(),
                                                                           "player": self.primary_player_color,
                                                                           "valid": "INVALID",
                                                                           "win": False, "message": msg}
@@ -59,28 +57,32 @@ class MyEnv(gym.Env):
         self.board.update_board_after_move(chosenMove)
         end, _ = self.board.check_if_player_won(self.primary_player_color)
         if end:
-            return self.board.encode(), self.reward_for_win, 1, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), self.reward_for_win, 1, {"move": chosenMove.__str__(),
                                                                    "player": self.primary_player_color, "valid": "WIN",
                                                                    "win": True, "message": ""}
         else:
-            return self.board.encode(), 0, 0, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), 0, 0, {"move": chosenMove.__str__(),
                                                                       "player": self.primary_player_color, "valid": "VALID",
                                                                        "win": False, "message": ""}
 
 
     def secondary_player_step(self):
-        if self.bot_name == "NONE":
-            chosenMove = "NONE"
-        else:
+        chosenMove = ""
+        if self.bot_name == "RANDOM" or self.bot_name == "MINMAX":
             chosenMove = self.secondary_player.make_turn(self.board)
             self.board.update_board_after_move(chosenMove)
+        elif self.bot_name == "RL":
+            chosenMove = self.secondary_player.make_turn(self.board)
+            self.board.update_board_after_move(chosenMove)
+        elif self.bot_name == "NONE":
+            chosenMove = "NONE"
         end, _ = self.board.check_if_player_won(self.secondary_player_color)
         if end:
-            return self.board.encode(), self.reward_for_lose, 1, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), self.reward_for_lose, 1, {"move": chosenMove.__str__(),
                                                                    "player": self.secondary_player_color, "valid": "LOSE",
                                                                    "win": False, "message": ""}
         else:
-            return self.board.encode(), 0, 0, {"move": self.board.move_to_string(chosenMove),
+            return self.board.encode(), 0, 0, {"move": chosenMove.__str__(),
                                                                       "player": self.secondary_player_color, "valid": "VALID",
                                                                        "win": False, "message": ""}
 

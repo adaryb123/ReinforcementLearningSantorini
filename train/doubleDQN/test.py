@@ -1,6 +1,6 @@
 from dueling_dqn_agent import DuelingDQNAgent
 from myenv import MyEnv
-from configs import default_single as conf
+from configs import invalid_vs_none_then_minmax as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
