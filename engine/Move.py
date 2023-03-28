@@ -12,7 +12,4 @@ class Move:
         row, col = coords
         return str(row + 1) + chr(ord('A') + col)
 
-    def setBuildCoords(self, row, col):
-        self.buildCoords = (row, col)
-
 

@@ -9,7 +9,7 @@ from line_profiler_pycharm import profile
 import pickle
 from utils import *
 
-from configs import valid_vs_rl as conf
+from configs import invalid_vs_rl as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -34,7 +34,7 @@ if load == True:
     old_seed = C.get('model_to_load')
 
 # seed = random.randint(10000,99999)
-seed = "xxx"
+
 
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
@@ -65,7 +65,6 @@ def log_move(info, logfile, env):
     logfile.write(action_log)
     logfile.write(env.render())
 
-
 # @profile
 def main():
     setup_output_files_directories(seed)
@@ -80,7 +79,7 @@ def main():
                                 n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                                 batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                                 learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                                invalid_moves_enabled=invalid_moves_enabled, color=env.primary_player_color)
+                                invalid_moves_enabled=invalid_moves_enabled)
 
         figure_file = 'plots/' + str(seed) + "/"
 
@@ -125,7 +124,7 @@ def main():
 
 
             while not done:
-                action = agent.choose_action(observation,env)
+                action = agent.choose_action(observation, env)
                 observation_, reward, done, info = env.primary_player_step(action)
                 if i % checkpoint_every == 0:
                     log_move(info,logfile,env)
@@ -155,6 +154,17 @@ def main():
                 observation = observation_
                 episode_steps += 1
 
+                # if i % checkpoint_every == 0:
+                    # action_log = "------------player: " + info.get("player") + " move: " + info.get(
+                    #     "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
+                    # logfile.write(action_log)
+                    # logfile.write(env.render())
+                    # if info_:
+                    #     action_log = "------------player: " + info_.get("player") + " move: " + info_.get(
+                    #         "move") + " which is: " + info_.get("valid") + ": " + info_.get("message") + "\n"
+                    #     logfile.write(action_log)
+                    #     logfile.write(env.render())
+                    # logfile.write("primary player reward: " + str(reward) + "\n")
 
             # if episode_score > best_score:
                 # best_score = episode_score
