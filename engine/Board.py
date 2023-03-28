@@ -1,5 +1,3 @@
-from engine.Tile import Tile
-from engine.Move import Move
 import random
 
 class Board:
@@ -103,23 +101,23 @@ class Board:
         return coordsList
 
     def check_move_valid(self, move):
-        row_from, col_from = move.fromCoords
-        row_to, col_to = move.toCoords
+        row_from, col_from = move[0]
+        row_to, col_to = move[1]
 
         if 0 <= row_to < 5 and 0 <= col_to < 5:
-                if self.players[row_to][col_to] == 0:
-                        if self.heights[row_to][col_to] != 4:
-                                if self.heights[row_to][col_to] <= self.heights[row_from][col_from] + 1:
-                                    return True, "OK",
+            if self.players[row_to][col_to] == 0:
+                if self.heights[row_to][col_to] != 4:
+                    if self.heights[row_to][col_to] <= self.heights[row_from][col_from] + 1:
+                        return True, "OK",
 
-                                return False, "moved more than 1 level higher"
-                        return False, "moved to dome"
-                return False, "moved to occupied tile"
+                    return False, "moved more than 1 level higher"
+                return False, "moved to dome"
+            return False, "moved to occupied tile"
         return False, "moved outside board"
 
     def check_build_valid(self, move):
-        row_from, col_from = move.fromCoords
-        row_build, col_build = move.buildCoords
+        row_from, col_from = move[0]
+        row_build, col_build = move[2]
 
         if 0 <= row_build < 5 and 0 <= col_build < 5:
             if self.players[row_build][col_build] == 0 or (row_build == row_from and col_build == col_from):
@@ -141,12 +139,12 @@ class Board:
 
         toCoordsList = self.make_clockwise_list(from_row, from_col)
         for to_row, to_col in toCoordsList:
-            move = Move((from_row, from_col), (to_row, to_col), (), player)
-            move_valid, _ = self.check_move_valid(move)
+            temp_move = [(from_row, from_col), (to_row, to_col), (), player]
+            move_valid, _ = self.check_move_valid(temp_move)
             if move_valid:
                 buildCoordsList = self.make_clockwise_list(to_row, to_col)
                 for build_row, build_col in buildCoordsList:
-                    move.setBuildCoords(build_row, build_col)
+                    move = [(from_row, from_col), (to_row, to_col), (build_row,build_col), player]
                     build_valid, _ = self.check_build_valid(move)
                     if build_valid:
                         moves.append(move)
@@ -163,12 +161,12 @@ class Board:
         action_index = 64
         toCoordsList = self.make_clockwise_list(from_row, from_col)
         for to_row, to_col in toCoordsList:
-            move = Move((from_row, from_col), (to_row, to_col), (), player)
-            move_valid, _ = self.check_move_valid(move)
+            temp_move = [(from_row, from_col), (to_row, to_col), (), player]
+            move_valid, _ = self.check_move_valid(temp_move)
             if move_valid:
                 buildCoordsList = self.make_clockwise_list(to_row, to_col)
                 for build_row, build_col in buildCoordsList:
-                    move.setBuildCoords(build_row, build_col)
+                    move = [(from_row, from_col), (to_row, to_col), (build_row,build_col), player]
                     build_valid, _ = self.check_build_valid(move)
                     if build_valid:
                         moves.append(move)
@@ -197,12 +195,12 @@ class Board:
         buildCoordsList = self.make_clockwise_list(to_row, to_col)
         build_row, build_col = buildCoordsList[int(number % 8)]
 
-        return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), player_color)
+        return [(from_row, from_col), (to_row, to_col), (build_row, build_col), player_color]
 
     def update_board_after_move(self, move):
-        fromCoords = move.fromCoords
-        toCoords = move.toCoords
-        buildCoords = move.buildCoords
+        fromCoords = move[0]
+        toCoords = move[1]
+        buildCoords = move[2]
 
         prev_row, prew_col = fromCoords
         new_row, new_col = toCoords
@@ -245,3 +243,16 @@ class Board:
             elif self.heights[white2_row][white2_col] == 3:
                 return True,[]
             return False, black_moves
+
+
+    def move_to_string(self, move):
+        if move == "NONE":
+            return move
+        fromCoords = move[0]
+        toCoords = move[1]
+        buildCoords = move[2]
+        return self.coords_to_text(fromCoords) + " -> " + self.coords_to_text(toCoords) + " build: " + self.coords_to_text(buildCoords)
+
+    def coords_to_text(self, coords):
+        row, col = coords
+        return str(row + 1) + chr(ord('A') + col)

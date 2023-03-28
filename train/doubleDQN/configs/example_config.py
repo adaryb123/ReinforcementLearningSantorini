@@ -16,5 +16,5 @@ config = {
     'replace_network_frequency': 1000,  # default is 100 for invalid moves_disabled
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
-    'opponent': 'NONE', # NONE, RANDOM, MINMAX OR RL
+    'opponent': 'NONE', # NONE, RANDOM, MINMAX, HEURISTIC OR RL
 }

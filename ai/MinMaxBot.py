@@ -1,16 +1,16 @@
 from engine.Board import Board
-from engine.Move import Move
 import copy
 
 
 class MinMaxBot:
-    def __init__(self, color):
+    def __init__(self, color, depth):
         self.color = color
+        self.depth = depth
 
     def make_turn(self, board, availableMoves=None):
         if availableMoves is None:
             availableMoves, _ = board.find_possible_moves(self.color)
-        _,move = self.max(1, -99999, 99999, board, availableMoves, self.color)
+        _,move = self.max(self.depth, -99999, 99999, board, availableMoves, self.color)
         return move
 
     def get_next_player(self, current_player):
@@ -71,10 +71,10 @@ class MinMaxBot:
         rowb2, colb2 = board.black2
         roww1, colw1 = board.white1
         roww2, colw2 = board.white2
-        score += board.tiles[rowb1][colb1].level
-        score += board.tiles[rowb2][colb2].level
-        score -= board.tiles[roww1][colw1].level
-        score -= board.tiles[roww2][colw2].level
+        score += board.heights[rowb1][colb1]
+        score += board.heights[rowb2][colb2]
+        score -= board.heights[roww1][colw1]
+        score -= board.heights[roww2][colw2]
 
         if player == "black":
             return score

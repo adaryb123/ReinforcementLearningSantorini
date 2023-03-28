@@ -9,7 +9,7 @@ from line_profiler_pycharm import profile
 import pickle
 from utils import *
 
-from configs import valid_vs_rl as conf
+from configs import valid_vs_heuristic as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -34,7 +34,7 @@ if load == True:
     old_seed = C.get('model_to_load')
 
 # seed = random.randint(10000,99999)
-seed = "xxx"
+# seed = "xxx"
 
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
