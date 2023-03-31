@@ -136,15 +136,15 @@ def main():
                     if i % checkpoint_every == 0:
                         log_move(info, logfile, env)
                     if done:
-                        if env.bot_name != "NONE":
-                            agent.store_transition(observation, action, reward, observation_, done)
+                        # if env.bot_name != "NONE":
+                        agent.store_transition(observation, action, reward, observation_, done)
 
                     else:
                         reward = env.calculate_reward()
                         agent.store_transition(observation, action, reward, observation_, done)
 
-                    if i % checkpoint_every == 0:
-                        logfile.write("primary player reward: " + str(reward) + "\n")
+                if i % checkpoint_every == 0:
+                    logfile.write("primary player reward: " + str(reward) + "\n")
 
                 last_message = info.get('message')
                 # episode_score += reward

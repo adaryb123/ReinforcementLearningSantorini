@@ -124,9 +124,9 @@ class Board:
             number -= 64
 
         toCoordsList = self.make_clockwise_list(from_row, from_col)
-        to_row, to_col = toCoordsList[int(number / 8)]
+        to_row, to_col = toCoordsList[number // 8]
         buildCoordsList = self.make_clockwise_list(to_row, to_col)
-        build_row, build_col = buildCoordsList[int(number % 8)]
+        build_row, build_col = buildCoordsList[number % 8]
 
         return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), player_color)
 
