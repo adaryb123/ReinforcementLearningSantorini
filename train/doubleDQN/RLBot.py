@@ -2,7 +2,7 @@ from engine.Board import Board, encode_board
 from engine.Move import Move
 import numpy as np
 import torch as T
-from deep_q_network import DuelingDeepQNetwork
+from deep_q_network_2x8 import DuelingDeepQNetwork
 import os
 
 

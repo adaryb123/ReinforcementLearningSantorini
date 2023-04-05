@@ -18,7 +18,7 @@ class DuelingDeepQNetwork(nn.Module):
         fc_input_dims = self.calculate_conv_output_dims(input_dims)
 
         self.fc1 = nn.Linear(fc_input_dims, 200)
-        self.fc2 = nn.Linear(200, 200)
+        # self.fc2 = nn.Linear(200, 200)
         self.V = nn.Linear(200, 1)
         self.A = nn.Linear(200, n_actions)
 
@@ -42,10 +42,10 @@ class DuelingDeepQNetwork(nn.Module):
         conv2 = F.relu(self.conv2(conv1))
         conv_state = conv2.view(conv2.size()[0], -1)
         flat1 = F.relu(self.fc1(conv_state))
-        flat2 = F.relu(self.fc2(flat1))
+        # flat2 = F.relu(self.fc2(flat1))
 
-        V = self.V(flat2)
-        A = self.A(flat2)
+        V = self.V(flat1)
+        A = self.A(flat1)
 
         return V, A
 

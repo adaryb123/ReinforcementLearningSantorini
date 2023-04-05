@@ -1,8 +1,8 @@
 config = {
-    'model_name': 'invalid_vs_none',
+    'model_name': 'invalid_vs_none_1linear_then_heuristic',
     'mode': 'single',
-    'load': False,
-    'model_to_load': 'xxx',
+    'load': True,
+    'model_to_load': 'invalid_vs_none_1linear',
     'n_episodes': 200000,
     'epsilon': 1,
     'eps_min': 0.01,
@@ -16,5 +16,6 @@ config = {
     'replace_network_frequency': 1000,
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
-    'opponent': "NONE",
+    'opponent': "HEURISTIC",
+    'network': "1LINEAR" # 2X8, 4X8, 2X32, 1LINEAR
 }

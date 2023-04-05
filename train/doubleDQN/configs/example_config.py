@@ -17,4 +17,5 @@ config = {
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
     'opponent': 'NONE', # NONE, RANDOM, MINMAX OR RL
+    'network': '2X8', # 2X8, 4X8, 2X32, 1LINEAR
 }

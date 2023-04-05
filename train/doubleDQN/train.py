@@ -8,8 +8,9 @@ from datetime import datetime
 from line_profiler_pycharm import profile
 import pickle
 from utils import *
+import torch as T
 
-from configs import invalid_vs_rl as conf
+from configs import invalid_vs_none_2x32 as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -29,11 +30,12 @@ invalid_moves_enabled = C.get('invalid_moves_enabled')
 seed = C.get('model_name')
 load = C.get('load')
 opponent = C.get('opponent')
+network = C.get('network')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-# seed = random.randint(10000,99999)
+seed = random.randint(10000,99999)
 
 
 def update_invalid_move_types(message, types):
@@ -67,6 +69,7 @@ def log_move(info, logfile, env):
 
 # @profile
 def main():
+
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
@@ -79,7 +82,7 @@ def main():
                                 n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                                 batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                                 learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                                invalid_moves_enabled=invalid_moves_enabled)
+                                invalid_moves_enabled=invalid_moves_enabled, network=network)
 
         figure_file = 'plots/' + str(seed) + "/"
 

@@ -2,7 +2,7 @@ config = {
     'model_name': 'valid_vs_none',
     'mode': 'single',   # single, competitive, cooperative, single_lookback
     'load': False,      # true if loading a previously trained model
-    'model_to_load': 'invalid_vs_none',
+    'model_to_load': 'invalid_vs_none_2x32',
      'n_episodes': 5000,        #default is 5000 for invalid_moves_disabled
     'epsilon': 0.5,       # 0.01 if loading a model (usually), 0.5is default for invalid_moves_disabled
     'eps_min': 0.01,
@@ -17,4 +17,5 @@ config = {
     'eps_dec': 1e-5,
     'invalid_moves_enabled': False,
     'opponent': 'RL', # NONE, RANDOM, MINMAX OR RL
+    'network': '2X8'  # 2X8, 4X8, 2X32, 1LINEAR
 }

@@ -5,6 +5,7 @@ from engine.Move import Move
 from RLBot import RLBot
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
+from ai.HeuristicBot import HeuristicBot
 import copy
 
 
@@ -13,7 +14,7 @@ class MyEnv(gym.Env):
     def __init__(self, mode, seed, bot_name, checkpoint_frequency):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
-        self.observation_space = spaces.Box(low=-1, high=5, shape=(2, 5, 5), dtype=int)
+        self.observation_space = spaces.Box(low=-1, high=5, shape=(3, 5, 5), dtype=int)
 
         self.board = Board()
         self.mode = mode # cooperative or competitive or single or single_lookback
@@ -34,6 +35,8 @@ class MyEnv(gym.Env):
         elif self.bot_name == "RL":
             self.secondary_player = RLBot(self.secondary_player_color, self.observation_space.shape,
                                           self.action_space.n, seed, checkpoint_frequency)
+        elif self.bot_name == "HEURISTIC":
+            self.secondary_player = HeuristicBot(self.secondary_player_color)
         if self.mode == "single_lookback":
             self.last_board = copy.deepcopy(self.board)
 
@@ -61,7 +64,7 @@ class MyEnv(gym.Env):
 
     def secondary_player_step(self):
         chosenMove = ""
-        if self.bot_name == "RANDOM" or self.bot_name == "MINMAX":
+        if self.bot_name == "RANDOM" or self.bot_name == "MINMAX" or self.bot_name == "HEURISTIC":
             chosenMove = self.secondary_player.make_turn(self.board)
             self.board.update_board_after_move(chosenMove)
         elif self.bot_name == "RL":

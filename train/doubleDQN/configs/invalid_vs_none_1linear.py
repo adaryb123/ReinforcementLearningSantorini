@@ -1,10 +1,10 @@
 config = {
-    'model_name': 'invalid_vs_none_then_minmax_continue',
+    'model_name': 'invalid_vs_none_1linear',
     'mode': 'single',
-    'load': True,
-    'model_to_load': 'invalid_vs_none_then_minmax',
-    'n_episodes': 55000,
-    'epsilon': 0.01,
+    'load': False,
+    'model_to_load': 'xxx',
+    'n_episodes': 200000,
+    'epsilon': 1,
     'eps_min': 0.01,
     'checkpoint_every': 1000,
     'learn_frequency': 100,
@@ -16,5 +16,6 @@ config = {
     'replace_network_frequency': 1000,
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
-    'opponent': "MINMAX",
+    'opponent': "NONE",
+    'network': "1LINEAR" # 2X8, 4X8, 2X32, 1LINEAR
 }
