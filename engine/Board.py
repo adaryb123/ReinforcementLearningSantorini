@@ -228,21 +228,18 @@ def encode_board(board):
     inputTensor = []
     board_heights = []
     board_players = []
-    valid_tiles = []
+    valid_tiles = [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]]
 
     for i in board.tiles:
         row_heights = []
         row_players = []
-        row_valid_tiles = []
 
         for j in i:
             row_heights.append(j.level)
             row_players.append(j.player)
-            row_valid_tiles.append(1)
 
         board_heights.append(row_heights)
         board_players.append(row_players)
-        valid_tiles.append(row_valid_tiles)
 
     inputTensor.append(board_heights)
     inputTensor.append(board_players)

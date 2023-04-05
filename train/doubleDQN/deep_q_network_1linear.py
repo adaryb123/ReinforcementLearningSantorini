@@ -12,7 +12,7 @@ class DuelingDeepQNetwork(nn.Module):
         self.checkpoint_dir = chkpt_dir
         self.checkpoint_file = os.path.join(self.checkpoint_dir, name)
 
-        self.conv1 = nn.Conv2d(2, 8, 3)
+        self.conv1 = nn.Conv2d(input_dims[0], 8, 3)
         self.conv2 = nn.Conv2d(8, 8, 3)
 
         fc_input_dims = self.calculate_conv_output_dims(input_dims)

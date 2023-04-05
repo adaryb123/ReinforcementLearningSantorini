@@ -17,5 +17,6 @@ config = {
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
     'opponent': "NONE",
-    'network': "2X32" # 2X8, 4X8, 2X32, 1LINEAR
+    'network': "2X32", # 2X8, 4X8, 2X32, 1LINEAR
+    'canals': 3  # 2
 }

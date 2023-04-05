@@ -10,7 +10,7 @@ import pickle
 from utils import *
 import torch as T
 
-from configs import invalid_vs_none_2x32 as conf
+from configs import invalid_vs_none_2x8 as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -31,6 +31,7 @@ seed = C.get('model_name')
 load = C.get('load')
 opponent = C.get('opponent')
 network = C.get('network')
+canals = C.get('canals')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
@@ -73,7 +74,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = MyEnv(mode, seed, opponent, checkpoint_every)
+        env = MyEnv(mode, seed, opponent, checkpoint_every, canals)
         env.reset()
         best_score = -np.inf
 

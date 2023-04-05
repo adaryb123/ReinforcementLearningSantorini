@@ -19,6 +19,7 @@ eps_dec = C.get('eps_dec')
 invalid_moves_enabled = C.get('invalid_moves_enabled')
 opponent = C.get('opponent')
 network = C.get('network')
+canals = C.get('canals')
 seed = C.get('model_name')
 # seed = "61603"
 # seed = "test-only-valid-moves"

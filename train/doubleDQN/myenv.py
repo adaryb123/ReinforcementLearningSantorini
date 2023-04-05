@@ -11,10 +11,10 @@ import copy
 
 class MyEnv(gym.Env):
 
-    def __init__(self, mode, seed, bot_name, checkpoint_frequency):
+    def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals):
         super(MyEnv, self).__init__()
         self.action_space = spaces.Discrete(128)
-        self.observation_space = spaces.Box(low=-1, high=5, shape=(3, 5, 5), dtype=int)
+        self.observation_space = spaces.Box(low=-1, high=5, shape=(canals, 5, 5), dtype=int)
 
         self.board = Board()
         self.mode = mode # cooperative or competitive or single or single_lookback
