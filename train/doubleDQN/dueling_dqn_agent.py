@@ -14,7 +14,7 @@ class DuelingDQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
                  mem_size, batch_size, eps_min, eps_dec,
                  replace, learn_amount, seed=None, checkpoint_dir=None,
-                 invalid_moves_enabled=False, network="2X8"):
+                 invalid_moves_enabled=False, network="2X8", epsilon_softmax=False):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -30,6 +30,7 @@ class DuelingDQNAgent(object):
         self.action_space = [i for i in range(n_actions)]
         self.learn_step_counter = 0
         self.invalid_moves_enabled = invalid_moves_enabled
+        self.epsilon_softmax = epsilon_softmax
 
         self.memory = ReplayBuffer(mem_size, input_dims, n_actions)
 
@@ -98,9 +99,15 @@ class DuelingDQNAgent(object):
 
                 best_action = T.argmax(advantages).item()
             else:
+                # if self.epsilon_softmax:
+                #     state = np.array([observation], copy=False, dtype=np.float32)  # torch
+                #     state_tensor = T.tensor(state).to(self.q_eval.device)
+                #     _, advantages = self.q_eval.forward(state_tensor)
+                #     softmax_nn = T.nn.Softmax()
+                #     probabilities = softmax_nn(advantages)
+                #     best_action = np.random.choice(self.action_space, p=probabilities)  # torch
+                # else:
                 best_action = np.random.choice(self.action_space)
-                # probabilities = T.softmax(advantages)
-                # best_action = np.random.choice(self.action_space,p=probabilities)  # torch
 
             return best_action
 

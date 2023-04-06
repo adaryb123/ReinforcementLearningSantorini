@@ -223,6 +223,32 @@ class Board:
                 return True,[]
             return False, black_moves
 
+    def get_player_height_diff(self, player_color):
+        height_diff = 0
+        for i in range(5):
+            for j in range(5):
+                if self.tiles[i][j].player >= 1:
+                    height_diff += self.tiles[i][j].level
+                elif self.tiles[i][j].player <= -1:
+                    height_diff -= self.tiles[i][j].level
+        if player_color == "black":
+            height_diff *= -1
+
+        return height_diff
+
+    def get_player_height(self, player_color):
+        height = 0
+        for i in range(5):
+            for j in range(5):
+                if player_color == "white":
+                    if self.tiles[i][j].player >= 1:
+                        height += self.tiles[i][j].level
+                elif player_color == "black":
+                    if self.tiles[i][j].player <= -1:
+                        height += self.tiles[i][j].level
+
+        return height
+
 
 def encode_board(board):
     inputTensor = []

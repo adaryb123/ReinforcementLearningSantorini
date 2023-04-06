@@ -20,6 +20,7 @@ invalid_moves_enabled = C.get('invalid_moves_enabled')
 opponent = C.get('opponent')
 network = C.get('network')
 canals = C.get('canals')
+epsilon_softmax = C.get('epsilon_softmax')
 seed = C.get('model_name')
 # seed = "61603"
 # seed = "test-only-valid-moves"
@@ -27,14 +28,14 @@ seed = C.get('model_name')
 invalid_moves_enabled = False
 
 def main():
-    env = MyEnv(mode, seed, opponent, checkpoint_every)
+    env = MyEnv(mode, seed, opponent, checkpoint_every, canals)
     env.reset()
     agent = DuelingDQNAgent(gamma=gamma, epsilon=0, lr=lr,
                             input_dims=env.observation_space.shape,
                             n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                             batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                             learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                            invalid_moves_enabled=invalid_moves_enabled, network=network)
+                            invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
 
     agent.load_models(seed)
 

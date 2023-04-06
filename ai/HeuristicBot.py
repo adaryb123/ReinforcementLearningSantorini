@@ -13,22 +13,9 @@ class HeuristicBot:
         for i in range(len(availableMoves)):
             boardCopy = copy.deepcopy(board)
             boardCopy.update_board_after_move(availableMoves[i])
-            score = self.get_player_height(boardCopy, self.color)
+            score = boardCopy.get_player_height(self.color)
             if score > best_score:
                 best_score = score
                 best_move = availableMoves[i]
         return best_move
 
-
-    def get_player_height(self, board, player_color):
-        height = 0
-        for i in range(5):
-            for j in range(5):
-                if player_color == "white":
-                    if board.tiles[i][j].player >= 1:
-                        height += board.tiles[i][j].level
-                elif player_color == "black":
-                    if board.tiles[i][j].player <= -1:
-                        height += board.tiles[i][j].level
-
-        return height

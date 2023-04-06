@@ -32,11 +32,12 @@ load = C.get('load')
 opponent = C.get('opponent')
 network = C.get('network')
 canals = C.get('canals')
+epsilon_softmax = C.get('epsilon_softmax')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-seed = random.randint(10000,99999)
+# seed = random.randint(10000,99999)
 
 
 def update_invalid_move_types(message, types):
@@ -83,7 +84,7 @@ def main():
                                 n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                                 batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                                 learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                                invalid_moves_enabled=invalid_moves_enabled, network=network)
+                                invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
 
         figure_file = 'plots/' + str(seed) + "/"
 
@@ -157,18 +158,6 @@ def main():
                     agent.learn()
                 observation = observation_
                 episode_steps += 1
-
-                # if i % checkpoint_every == 0:
-                    # action_log = "------------player: " + info.get("player") + " move: " + info.get(
-                    #     "move") + " which is: " + info.get("valid") + ": " + info.get("message") + "\n"
-                    # logfile.write(action_log)
-                    # logfile.write(env.render())
-                    # if info_:
-                    #     action_log = "------------player: " + info_.get("player") + " move: " + info_.get(
-                    #         "move") + " which is: " + info_.get("valid") + ": " + info_.get("message") + "\n"
-                    #     logfile.write(action_log)
-                    #     logfile.write(env.render())
-                    # logfile.write("primary player reward: " + str(reward) + "\n")
 
             # if episode_score > best_score:
                 # best_score = episode_score

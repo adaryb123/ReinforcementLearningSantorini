@@ -18,6 +18,8 @@ class MyEnv(gym.Env):
 
         self.board = Board()
         self.mode = mode # cooperative or competitive or single or single_lookback
+        if self.mode == "single_lookback":
+            self.last_board = copy.deepcopy(self.board)
 
         self.reward_for_invalid_move = -100
         self.reward_for_valid_move = 1
@@ -37,8 +39,6 @@ class MyEnv(gym.Env):
                                           self.action_space.n, seed, checkpoint_frequency)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
-        if self.mode == "single_lookback":
-            self.last_board = copy.deepcopy(self.board)
 
     def primary_player_step(self, action):
         if self.mode == "single_lookback":
@@ -86,42 +86,15 @@ class MyEnv(gym.Env):
         if self.mode == "cooperative":
             return self.reward_for_valid_move
         elif self.mode == "competitive":
-            return self.get_player_height_diff(self.board, self.primary_player_color)
+            return self.board.get_player_height_diff(self.primary_player_color)
         elif self.mode == "single":
-            return self.get_player_height(self.board, self.primary_player_color)
+            return self.board.get_player_height(self.primary_player_color)
         elif self.mode == "single_lookback":
             return self.get_player_height_change(self.board, self.last_board, self.primary_player_color)
 
 
-    def get_player_height_diff(self, board, player_color):
-        height_diff = 0
-        for i in range(5):
-            for j in range(5):
-                if board.tiles[i][j].player >= 1:
-                    height_diff += board.tiles[i][j].level
-                elif board.tiles[i][j].player <= -1:
-                    height_diff -= board.tiles[i][j].level
-        if player_color == "black":
-            height_diff *= -1
-
-        return height_diff
-
-    def get_player_height(self, board, player_color):
-        height = 0
-        for i in range(5):
-            for j in range(5):
-                if player_color == "white":
-                    if board.tiles[i][j].player >= 1:
-                        height += board.tiles[i][j].level
-                elif player_color == "black":
-                    if board.tiles[i][j].player <= -1:
-                        height += board.tiles[i][j].level
-
-        return height
-
     def get_player_height_change(self, new_board, prev_board, player_color):
-        return self.get_player_height(new_board,player_color) - self.get_player_height(prev_board,player_color)
-
+        return new_board.get_player_height(player_color) - prev_board.get_player_height(player_color)
 
     def reset(self):
         self.board = Board()
