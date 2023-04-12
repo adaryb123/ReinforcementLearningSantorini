@@ -1,5 +1,5 @@
-from dueling_dqn_agent import DuelingDQNAgent
-from myenv import MyEnv
+from dqn_agent import DQNAgent
+from environment import Environment
 from configs import invalid_vs_none_then_minmax as conf
 
 C = conf.config
@@ -28,9 +28,9 @@ seed = C.get('model_name')
 invalid_moves_enabled = False
 
 def main():
-    env = MyEnv(mode, seed, opponent, checkpoint_every, canals)
+    env = Environment(mode, seed, opponent, checkpoint_every, canals)
     env.reset()
-    agent = DuelingDQNAgent(gamma=gamma, epsilon=0, lr=lr,
+    agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
                             input_dims=env.observation_space.shape,
                             n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                             batch_size=batch_size, replace=replace, eps_dec=eps_dec,

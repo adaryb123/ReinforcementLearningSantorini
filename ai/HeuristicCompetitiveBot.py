@@ -1,6 +1,6 @@
 import copy
 
-class HeuristicBot:
+class HeuristicCompetitiveBot:
     def __init__(self, color):
         self.color = color
 
@@ -12,7 +12,7 @@ class HeuristicBot:
         for i in range(len(availableMoves)):
             boardCopy = copy.deepcopy(board)
             boardCopy.update_board_after_move(availableMoves[i])
-            score = boardCopy.get_player_height(self.color)
+            score = boardCopy.get_player_height_diff(self.color)
             if score > best_score:
                 best_score = score
                 best_move = availableMoves[i]

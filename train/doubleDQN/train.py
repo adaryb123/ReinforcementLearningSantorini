@@ -1,16 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from dueling_dqn_agent import DuelingDQNAgent
-from myenv import MyEnv
-import os
+from dqn_agent import DQNAgent
+from environment import Environment
 import random
 from datetime import datetime
-from line_profiler_pycharm import profile
-import pickle
 from utils import *
-import torch as T
 
-from configs import invalid_vs_none_2x8 as conf
+from configs import invalid_vs_none_2x8_then_heuristic_2x_then_minmax as conf
+
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -69,17 +65,16 @@ def log_move(info, logfile, env):
     logfile.write(action_log)
     logfile.write(env.render())
 
-# @profile
 def main():
 
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = MyEnv(mode, seed, opponent, checkpoint_every, canals)
+        env = Environment(mode, seed, opponent, checkpoint_every, canals)
         env.reset()
         best_score = -np.inf
 
-        agent = DuelingDQNAgent(gamma=gamma, epsilon=epsilon, lr=lr,
+        agent = DQNAgent(gamma=gamma, epsilon=epsilon, lr=lr,
                                 input_dims=env.observation_space.shape,
                                 n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                                 batch_size=batch_size, replace=replace, eps_dec=eps_dec,

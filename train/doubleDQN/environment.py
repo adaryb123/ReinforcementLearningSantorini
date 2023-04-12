@@ -1,18 +1,17 @@
-import gym
-from gym import spaces
+from gym import Env, spaces
 from engine.Board import Board, encode_board
-from engine.Move import Move
 from RLBot import RLBot
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
 from ai.HeuristicBot import HeuristicBot
+from ai.HeuristicCompetitiveBot import HeuristicCompetitiveBot
 import copy
 
 
-class MyEnv(gym.Env):
+class Environment(Env):
 
     def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals):
-        super(MyEnv, self).__init__()
+        super(Environment, self).__init__()
         self.action_space = spaces.Discrete(128)
         self.observation_space = spaces.Box(low=-1, high=5, shape=(canals, 5, 5), dtype=int)
 
@@ -40,6 +39,9 @@ class MyEnv(gym.Env):
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 
+        elif self.bot_name == "HEURISTIC-COMPETITIVE":
+            self.secondary_player = HeuristicCompetitiveBot(self.secondary_player_color)
+
     def primary_player_step(self, action):
         if self.mode == "single_lookback":
             self.last_board = copy.deepcopy(self.board)
@@ -64,14 +66,11 @@ class MyEnv(gym.Env):
 
     def secondary_player_step(self):
         chosenMove = ""
-        if self.bot_name == "RANDOM" or self.bot_name == "MINMAX" or self.bot_name == "HEURISTIC":
+        if self.bot_name == "NONE":
+            chosenMove = "NONE"
+        else:
             chosenMove = self.secondary_player.make_turn(self.board)
             self.board.update_board_after_move(chosenMove)
-        elif self.bot_name == "RL":
-            chosenMove = self.secondary_player.make_turn(self)
-            self.board.update_board_after_move(chosenMove)
-        elif self.bot_name == "NONE":
-            chosenMove = "NONE"
         end, _ = self.board.check_if_player_won(self.secondary_player_color)
         if end:
             return encode_board(self.board), self.reward_for_lose, 1, {"move": chosenMove.__str__(),

@@ -1,5 +1,3 @@
-from engine.Board import Board
-from engine.Move import Move
 import random
 
 class RandomBot:

@@ -1,16 +1,13 @@
 import numpy as np
 import torch as T
-# from deep_q_network_2x8 import DuelingDeepQNetwork
-from replay_memory import ReplayBuffer
-from line_profiler_pycharm import profile
-from engine.Board import Board, decode_board
-from myenv import MyEnv
+from replay_memory import ReplayMemory
+from engine.Board import decode_board
 import deep_q_network_2x8
 import deep_q_network_2x32
 import deep_q_network_4x8
 import deep_q_network_1linear
 
-class DuelingDQNAgent(object):
+class DQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
                  mem_size, batch_size, eps_min, eps_dec,
                  replace, learn_amount, seed=None, checkpoint_dir=None,
@@ -32,41 +29,41 @@ class DuelingDQNAgent(object):
         self.invalid_moves_enabled = invalid_moves_enabled
         self.epsilon_softmax = epsilon_softmax
 
-        self.memory = ReplayBuffer(mem_size, input_dims, n_actions)
+        self.memory = ReplayMemory(mem_size, input_dims, n_actions)
 
         if network=="2X8":
-            self.q_eval = deep_q_network_2x8.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_eval = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_eval',
                                               chkpt_dir=self.chkpt_dir)
-            self.q_next = deep_q_network_2x8.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_next = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_next',
                                               chkpt_dir=self.chkpt_dir)
         elif network=="4X8":
-            self.q_eval = deep_q_network_4x8.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_eval = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_eval',
                                               chkpt_dir=self.chkpt_dir)
-            self.q_next = deep_q_network_4x8.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_next = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_next',
                                               chkpt_dir=self.chkpt_dir)
         elif network=="2X32":
-            self.q_eval = deep_q_network_2x32.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_eval = deep_q_network_2x32.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_eval',
                                               chkpt_dir=self.chkpt_dir)
-            self.q_next = deep_q_network_2x32.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_next = deep_q_network_2x32.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_next',
                                               chkpt_dir=self.chkpt_dir)
         elif network=="1LINEAR":
-            self.q_eval = deep_q_network_1linear.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_eval = deep_q_network_1linear.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_eval',
                                               chkpt_dir=self.chkpt_dir)
-            self.q_next = deep_q_network_1linear.DuelingDeepQNetwork(self.lr, self.n_actions,
+            self.q_next = deep_q_network_1linear.DeepQNetwork(self.lr, self.n_actions,
                                               input_dims=self.input_dims,
                                               name=str(self.seed) + '_q_next',
                                               chkpt_dir=self.chkpt_dir)
@@ -145,7 +142,6 @@ class DuelingDQNAgent(object):
         self.epsilon = self.epsilon - self.eps_dec \
             if self.epsilon > self.eps_min else self.eps_min
 
-    # @profile
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:  # iba na zaciatku
             return
