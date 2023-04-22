@@ -1,3 +1,9 @@
+"""
+Random bot
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 import random
 
 class RandomBot:

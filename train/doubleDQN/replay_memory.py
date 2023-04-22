@@ -1,10 +1,17 @@
+"""
+Memory of moves that agent made
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+Based on: https://github.com/philtabor/Deep-Q-Learning-Paper-To-Code/tree/master/DuelingDQN
+"""
+
 import numpy as np
 
 class ReplayMemory(object):
     def __init__(self, max_size, input_shape, n_actions):
         self.mem_size = max_size
         self.mem_cntr = 0
-        self.state_memory = np.zeros((self.mem_size, *input_shape),             #device = cuda
+        self.state_memory = np.zeros((self.mem_size, *input_shape),
                                      dtype=np.float32)
         self.new_state_memory = np.zeros((self.mem_size, *input_shape),
                                          dtype=np.float32)
@@ -24,7 +31,7 @@ class ReplayMemory(object):
 
     def sample_buffer(self, batch_size):
         max_mem = min(self.mem_cntr, self.mem_size)
-        batch = np.random.choice(max_mem, batch_size, replace=False)        #torch
+        batch = np.random.choice(max_mem, batch_size, replace=False)
 
         states = self.state_memory[batch]
         actions = self.action_memory[batch]

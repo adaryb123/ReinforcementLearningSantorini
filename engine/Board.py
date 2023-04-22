@@ -1,3 +1,9 @@
+"""
+The game board for Santorini
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 from engine.Tile import Tile
 from engine.Move import Move
 import random
@@ -21,6 +27,7 @@ class Board:
         return output
 
     def setup_players(self):
+        """ Initial setup of players is random"""
         finished = 0
         current = -1
         black1 = 0
@@ -53,6 +60,7 @@ class Board:
         return coordsList
 
     def check_move_valid(self, move):
+        """ There are 7 ways a move can be illegal, check them all here"""
         row_from, col_from = move.fromCoords
         row_to, col_to = move.toCoords
         row_build, col_build = move.buildCoords
@@ -79,6 +87,7 @@ class Board:
     def find_possible_moves(self, player):
         moves = []
 
+        """Find all legal moves of the first worker"""
         if player == "black":
             from_row, from_col = self.black1
         else:
@@ -93,6 +102,7 @@ class Board:
                 if valid:
                     moves.append(move)
 
+        """Find all legal moves of the second worker"""
         if player == "black":
             from_row, from_col = self.black2
         else:
@@ -111,6 +121,7 @@ class Board:
         return moves
 
     def create_move_from_number(self, number, player_color):
+        """Number is converted to the corresponding move based on the clockwise list"""
         if number < 64:
             if player_color == "white":
                 from_row, from_col = self.white1
@@ -130,53 +141,8 @@ class Board:
 
         return Move((from_row, from_col), (to_row, to_col), (build_row, build_col), player_color)
 
-        #
-        # currentLevel = self.tiles[row][col].level
-        # toCoordsList = [(row,col-1), (row,col+1), (row-1,col-1), (row-1,col), (row-1,col+1), (row+1,col-1), (row+1,col), (row+1,col+1)]
-        # for i, j in toCoordsList:
-        #     if self.check_valid_for_move(i, j, currentLevel):
-        #         moves.extend(self.add_all_builds((row, col), (i, j), player))
-        #
-        # if player == "black":
-        #     row, col = self.black2
-        # else:
-        #     row, col = self.white2
-        #
-        # currentLevel = self.tiles[row][col].level
-        # # clockwise
-        # toCoordsList = [(row-1,col), (row-1,col+1), (row,col+1), (row+1,col+1), (row+1,col), (row+1,col-1), (row,col-1), (row-1,col-1)]
-        # for i, j in toCoordsList:
-        #     if self.check_valid_for_move(i, j, currentLevel):
-        #         moves.extend(self.add_all_builds((row, col), (i, j), player))
-
-        # return moves
-
-    # def check_valid_for_move(self, row, col, currentLevel):
-    #     if 0 <= row < 5 and 0 <= col < 5:
-    #         if self.tiles[row][col].level <= currentLevel + 1:
-    #             if self.tiles[row][col].level != 4 and self.tiles[row][col].player == 0:
-    #                 return True
-    #     return False
-    #
-    # def add_all_builds(self, fromCoords, toCoords, player):
-    #     moves = []
-    #     row, col = toCoords
-    #     moves.append(Move(fromCoords, toCoords, fromCoords, player))   # always can build on the tile from were it came
-    #     # clockwise
-    #     buildCoordsList = [(row-1,col), (row-1,col+1), (row,col+1), (row+1,col+1), (row+1,col), (row+1,col-1), (row,col-1), (row-1,col-1)]
-    #     for i, j in buildCoordsList:
-    #         if self.check_valid_for_build(i, j):
-    #             moves.append(Move(fromCoords, toCoords, (i, j), player))
-    #
-    #     return moves
-    #
-    # def check_valid_for_build(self, row, col):
-    #     if 0 <= row < 5 and 0 <= col < 5:
-    #         if self.tiles[row][col].level != 4 and self.tiles[row][col].player == 0:
-    #             return True
-    #     return False
-
     def update_board_after_move(self, move):
+        """Execute the move on the game board"""
         fromCoords = move.fromCoords
         toCoords = move.toCoords
         buildCoords = move.buildCoords
@@ -198,7 +164,9 @@ class Board:
         self.tiles[prev_row][prew_col].player = 0
         self.tiles[build_row][build_col].level += 1
 
-    def check_if_player_won(self, last_player):     #also returns available moves for next player
+    def check_if_player_won(self, last_player):
+        """There are 2 waysa player can win. Check them both.
+        Function also returns all possible moves of the next player"""
         if last_player == "black":
             white_moves = self.find_possible_moves("white")
             if len(white_moves) == 0:
@@ -223,20 +191,8 @@ class Board:
                 return True,[]
             return False, black_moves
 
-    def get_player_height_diff(self, player_color):
-        height_diff = 0
-        for i in range(5):
-            for j in range(5):
-                if self.tiles[i][j].player >= 1:
-                    height_diff += self.tiles[i][j].level
-                elif self.tiles[i][j].player <= -1:
-                    height_diff -= self.tiles[i][j].level
-        if player_color == "black":
-            height_diff *= -1
-
-        return height_diff
-
     def get_player_height(self, player_color):
+        """Sum total height of the player's workers"""
         height = 0
         for i in range(5):
             for j in range(5):
@@ -249,8 +205,22 @@ class Board:
 
         return height
 
+    def get_player_height_diff(self, player_color):
+        """Sum total height of the player's workers, subtracted by the height of the enemy player's workers"""
+        height_diff = 0
+        for i in range(5):
+            for j in range(5):
+                if self.tiles[i][j].player >= 1:
+                    height_diff += self.tiles[i][j].level
+                elif self.tiles[i][j].player <= -1:
+                    height_diff -= self.tiles[i][j].level
+        if player_color == "black":
+            height_diff *= -1
+
+        return height_diff
 
 def encode_board(board):
+    """Create tensor from Board object"""
     inputTensor = []
     board_heights = []
     board_players = []
@@ -273,6 +243,7 @@ def encode_board(board):
     return inputTensor
 
 def decode_board(inputTensor):
+    """Create Board object from tensor"""
     board = Board()
     for i in range(len(board.tiles)):
         for j in range(len(board.tiles)):

@@ -1,6 +1,12 @@
+"""
+One tile of the game board
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 class Tile:
     def __init__(self):
-        self.level = 0      # 4 means dome
+        self.level = 0      # can be 0,1,2,3,4.   4 means dome
         self.player = 0     # 0 means empty, -1 and -2 means black, 1 and 2 means white,
 
     def __str__(self):

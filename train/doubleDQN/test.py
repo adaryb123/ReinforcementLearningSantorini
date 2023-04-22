@@ -1,3 +1,9 @@
+"""
+Script for testing Double deep Q learning agent in 1 game
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 from dqn_agent import DQNAgent
 from environment import Environment
 from configs import invalid_vs_none_then_minmax as conf

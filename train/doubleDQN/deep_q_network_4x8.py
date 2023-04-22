@@ -1,3 +1,10 @@
+"""
+Deep Q network, variant with 4 convolutional layers and 8 channels
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+Based on: https://github.com/philtabor/Deep-Q-Learning-Paper-To-Code/tree/master/DuelingDQN
+"""
+
 import os
 import torch as T
 import torch.nn as nn
@@ -26,8 +33,7 @@ class DeepQNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
         self.loss = nn.MSELoss()
-        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')        #prehodit do mainu
-        # self.device = T.device('cpu')
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
         self.to(self.device)
 
         print("device= " + str(self.device))

@@ -1,3 +1,9 @@
+"""
+Object representing one player's turn
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 class Move:
     def __init__(self, fromCoods, toCoords, buildCoords, player):
         self.fromCoords = fromCoods

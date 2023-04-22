@@ -1,5 +1,5 @@
 config = {
-    'model_name': 'invalid_vs_none_4x8',
+    'model_name': 'invalid_vs_RL_softmax',
     'mode': 'single',
     'load': False,
     'model_to_load': 'xxx',
@@ -16,8 +16,8 @@ config = {
     'replace_network_frequency': 1000,
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
-    'opponent': "NONE",
-    'network': "4X8", # 2X8, 4X8, 2X32, 1LINEAR
+    'opponent': "RL",
+    'network': "2X8", # 2X8, 4X8, 2X32, 1LINEAR
     'canals': 3,  # 2
-    'epsilon_softmax' : False   # true if the epsilon moves should be based on probability
+    'epsilon_softmax' : True   # true if the epsilon moves should be based on probability
 }

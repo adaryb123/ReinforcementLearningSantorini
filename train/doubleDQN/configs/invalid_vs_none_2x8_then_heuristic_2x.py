@@ -1,5 +1,5 @@
 config = {
-    'model_name': 'invalid_vs_none_2x8_then_heuristic_2x.py',
+    'model_name': 'invalid_vs_none_2x8_then_heuristic_2x',
     'mode': 'single',
     'load': True,
     'model_to_load': 'invalid_vs_none_2x8_then_heuristic',

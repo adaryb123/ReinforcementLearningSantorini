@@ -1,3 +1,9 @@
+"""
+Script for training Double deep Q learning agent
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 import numpy as np
 from dqn_agent import DQNAgent
 from environment import Environment
@@ -5,7 +11,7 @@ import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_none_2x8_then_heuristic_2x_then_minmax as conf
+from configs import invalid_vs_RL_softmax_competitive_temp as conf
 
 
 C = conf.config
@@ -136,7 +142,6 @@ def main():
                     if i % checkpoint_every == 0:
                         log_move(info, logfile, env)
                     if done:
-                        # if env.bot_name != "NONE":
                         agent.store_transition(observation, action, reward, observation_, done)
 
                     else:
@@ -147,15 +152,12 @@ def main():
                     logfile.write("primary player reward: " + str(reward) + "\n")
 
                 last_message = info.get('message')
-                # episode_score += reward
 
                 if i % learn_frequency == 0:
                     agent.learn()
                 observation = observation_
                 episode_steps += 1
 
-            # if episode_score > best_score:
-                # best_score = episode_score
             if reward > episode_score:
                 episode_score = reward
 

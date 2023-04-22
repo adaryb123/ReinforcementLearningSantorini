@@ -1,10 +1,10 @@
 config = {
-    'model_name': 'invalid_vs_none_2x8_then_heuristic_2x_then_minmax',
-    'mode': 'single',
+    'model_name': 'invalid_vs_RL_softmax_competitive',
+    'mode': 'competitive',
     'load': True,
-    'model_to_load': 'invalid_vs_none_2x8_then_heuristic_2x',
-    'n_episodes': 100000,
-    'epsilon': 0.01,
+    'model_to_load': 'invalid_vs_RL_softmax_competitive',
+    'n_episodes': 200000,
+    'epsilon': 0.7,
     'eps_min': 0.01,
     'checkpoint_every': 1000,
     'learn_frequency': 100,
@@ -16,8 +16,8 @@ config = {
     'replace_network_frequency': 1000,
     'eps_dec': 1e-5,
     'invalid_moves_enabled': True,
-    'opponent': "MINMAX",
+    'opponent': "RL",
     'network': "2X8", # 2X8, 4X8, 2X32, 1LINEAR
     'canals': 3,  # 2
-    'epsilon_softmax' : False   # true if the epsilon moves should be based on probability
+    'epsilon_softmax' : True   # true if the epsilon moves should be based on probability
 }

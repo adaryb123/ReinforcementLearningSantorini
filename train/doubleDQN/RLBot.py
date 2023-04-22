@@ -1,3 +1,9 @@
+"""
+Version of agent only for testing and validation
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 from engine.Board import encode_board
 import numpy as np
 import torch as T
@@ -32,8 +38,12 @@ class RLBot:
         self.counter += 1
 
         observation = encode_board(board)
-        state = np.array([observation], copy=False, dtype=np.float32)  # torch
-        state_tensor = T.tensor(self.flip_tensor_values(state)).to(self.q_eval.device)
+        state = np.array([observation], copy=False, dtype=np.float32)
+
+        if self.color=="black":
+            state = self.flip_tensor_values(state)
+
+        state_tensor = T.tensor(state).to(self.q_eval.device)
         _, advantages = self.q_eval.forward(state_tensor)
 
         for action in range(len(advantages[0])):

@@ -1,5 +1,11 @@
-import copy
+"""
+Minmax bot with alpha beta prunning
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
 
+
+import copy
 
 class MinMaxBot:
     def __init__(self, color):

@@ -1,3 +1,9 @@
+"""
+Heuritsic bot - more friendly version
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 import copy
 
 class HeuristicBot:

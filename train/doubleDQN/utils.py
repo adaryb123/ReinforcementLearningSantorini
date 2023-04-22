@@ -1,3 +1,9 @@
+"""
+Utility functions used in trian.py script
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+"""
+
 import os
 import matplotlib.pyplot as plt
 import pickle

@@ -1,3 +1,10 @@
+"""
+Deep Q network, variant with 1 linear layer
+Author: Adam Rybansky (xryban00)
+FIT VUT 2023
+Based on: https://github.com/philtabor/Deep-Q-Learning-Paper-To-Code/tree/master/DuelingDQN
+"""
+
 import os
 import torch as T
 import torch.nn as nn
@@ -18,14 +25,13 @@ class DeepQNetwork(nn.Module):
         fc_input_dims = self.calculate_conv_output_dims(input_dims)
 
         self.fc1 = nn.Linear(fc_input_dims, 200)
-        # self.fc2 = nn.Linear(200, 200)
+
         self.V = nn.Linear(200, 1)
         self.A = nn.Linear(200, n_actions)
 
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
         self.loss = nn.MSELoss()
-        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')        #prehodit do mainu
-        # self.device = T.device('cpu')
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
         self.to(self.device)
 
         print("device= " + str(self.device))
@@ -42,7 +48,6 @@ class DeepQNetwork(nn.Module):
         conv2 = F.relu(self.conv2(conv1))
         conv_state = conv2.view(conv2.size()[0], -1)
         flat1 = F.relu(self.fc1(conv_state))
-        # flat2 = F.relu(self.fc2(flat1))
 
         V = self.V(flat1)
         A = self.A(flat1)
