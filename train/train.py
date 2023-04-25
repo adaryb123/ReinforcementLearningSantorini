@@ -6,12 +6,12 @@ FIT VUT 2023
 
 import numpy as np
 from dqn_agent import DQNAgent
-from environment import Environment
+5from environment import Environment
 import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_RL_softmax as conf
+from configs import invalid_vs_RL_softmax_continue_vs_not_replacing_RL as conf
 
 
 C = conf.config
@@ -38,8 +38,6 @@ epsilon_softmax = C.get('epsilon_softmax')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
-
-seed = random.randint(10000,99999)
 
 
 def update_invalid_move_types(message, types):
@@ -76,7 +74,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = Environment(mode, seed, opponent, checkpoint_every, canals)
+        env = Environment(mode, seed, opponent, 1000000, canals)
         env.reset()
         best_score = -np.inf
 

@@ -4,7 +4,7 @@ from ai.RandomBot import RandomBot
 from ai.MinMaxBot import MinMaxBot
 from ai.HeuristicBot import HeuristicBot
 from ai.HeuristicCompetitiveBot import HeuristicCompetitiveBot
-from train.RLBot import RLBot
+from ai.RLBot import RLBot
 import random
 
 def get_input_for_player(color):
@@ -30,7 +30,7 @@ def get_input_for_player(color):
         elif number == 5:
             seed = input("Type RL mode name. Make sure the model is stored in train/models:")
             blackPlayer = RLBot(color,seed)
-            if not whitePlayer.check_model_file_exists():
+            if not blackPlayer.check_model_file_exists():
                 print("ERROR: model doesnt exist")
                 return get_input_for_player(color)
         else:

@@ -7,17 +7,21 @@ FIT VUT 2023
 from engine.Board import encode_board
 import numpy as np
 import torch as T
-from train.deep_q_network_2x8 import DeepQNetwork
 import os
+try:
+    from deep_q_network_2x8 import DeepQNetwork
+except:
+    from train.deep_q_network_2x8 import DeepQNetwork
 
 
 class RLBot:
     def __init__(self, color, seed, input_dims=(3,5,5), n_actions=128, checkpoint_frequency=1000, lr=0.0001):
         self.color = color
-        self.chkpt_dir = 'models/'
+        self.chkpt_dir = '../train/models/'
         self.seed = seed
         self.counter = 0
         self.checkpoint_frequency = checkpoint_frequency
+
         self.q_eval = DeepQNetwork(lr, n_actions,
                                           input_dims=input_dims,
                                           name=str(self.seed) + '_secondary_q_eval',
@@ -36,7 +40,7 @@ class RLBot:
         states[:, 1, :, :] *= -1
         return states
 
-    def make_turn(self, board, _):
+    def make_turn(self, board, _=None):
 
         if self.counter % self.checkpoint_frequency == 0:
             self.reload_network()

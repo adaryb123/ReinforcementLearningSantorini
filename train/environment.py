@@ -7,7 +7,7 @@ Based on: https://github.com/philtabor/Deep-Q-Learning-Paper-To-Code/tree/master
 
 from gym import Env, spaces
 from engine.Board import Board, encode_board
-from RLBot import RLBot
+from ai.RLBot import RLBot
 from ai.MinMaxBot import MinMaxBot
 from ai.RandomBot import RandomBot
 from ai.HeuristicBot import HeuristicBot
