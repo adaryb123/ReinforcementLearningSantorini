@@ -11,7 +11,7 @@ import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_RL_softmax_competitive_temp as conf
+from configs import invalid_vs_RL_softmax as conf
 
 
 C = conf.config
@@ -39,7 +39,7 @@ old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-# seed = random.randint(10000,99999)
+seed = random.randint(10000,99999)
 
 
 def update_invalid_move_types(message, types):
@@ -81,11 +81,11 @@ def main():
         best_score = -np.inf
 
         agent = DQNAgent(gamma=gamma, epsilon=epsilon, lr=lr,
-                                input_dims=env.observation_space.shape,
-                                n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
-                                batch_size=batch_size, replace=replace, eps_dec=eps_dec,
-                                learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                                invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
+                         input_dims=env.observation_space.shape,
+                         n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
+                         batch_size=batch_size, replace=replace, eps_dec=eps_dec,
+                         learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
+                         invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
 
         figure_file = 'plots/' + str(seed) + "/"
 

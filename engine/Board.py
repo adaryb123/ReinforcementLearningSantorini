@@ -60,7 +60,7 @@ class Board:
         return coordsList
 
     def check_move_valid(self, move):
-        """ There are 7 ways a move can be illegal, check them all here"""
+        """ There are 7 ways a generated move can be illegal, check them all here"""
         row_from, col_from = move.fromCoords
         row_to, col_to = move.toCoords
         row_build, col_build = move.buildCoords
@@ -84,6 +84,26 @@ class Board:
                 return False, "moved to occupied tile"
             return False, "build outside board"
         return False, "moved outside board"
+
+    def check_player_input_move_valid(self, move):
+        """ There are 3 more ways a player input can be illegal, check them all here"""
+        def is_adjacent(number1, number2):
+            return -1 <= (number1 - number2) <= 1
+
+        row_from, col_from = move.fromCoords
+        row_to, col_to = move.toCoords
+        row_build, col_build = move.buildCoords
+
+        player_color = move.player
+        move_from_player = self.tiles[row_from][col_from].player
+
+        if move_from_player < 0 and player_color == "black" or move_from_player > 0 and player_color == "white":
+            if is_adjacent(row_from,row_to) and is_adjacent(col_from,col_to):
+                if is_adjacent(row_to,row_build) and is_adjacent(col_to,col_build):
+                    return self.check_move_valid(move)
+                return False, "build on non adjacent tile"
+            return False, "move to non adjacent tile"
+        return False, "move from unoccupied tile"
     def find_possible_moves(self, player):
         moves = []
 

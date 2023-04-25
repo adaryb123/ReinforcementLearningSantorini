@@ -40,40 +40,40 @@ class DQNAgent(object):
 
         if network=="2X8":
             self.q_eval = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_eval',
-                                              chkpt_dir=self.chkpt_dir)
+                                                          input_dims=self.input_dims,
+                                                          name=str(self.seed) + '_q_eval',
+                                                          chkpt_dir=self.chkpt_dir)
             self.q_next = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_next',
-                                              chkpt_dir=self.chkpt_dir)
+                                                          input_dims=self.input_dims,
+                                                          name=str(self.seed) + '_q_next',
+                                                          chkpt_dir=self.chkpt_dir)
         elif network=="4X8":
             self.q_eval = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_eval',
-                                              chkpt_dir=self.chkpt_dir)
+                                                          input_dims=self.input_dims,
+                                                          name=str(self.seed) + '_q_eval',
+                                                          chkpt_dir=self.chkpt_dir)
             self.q_next = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_next',
-                                              chkpt_dir=self.chkpt_dir)
+                                                          input_dims=self.input_dims,
+                                                          name=str(self.seed) + '_q_next',
+                                                          chkpt_dir=self.chkpt_dir)
         elif network=="2X32":
             self.q_eval = deep_q_network_2x32.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_eval',
-                                              chkpt_dir=self.chkpt_dir)
+                                                           input_dims=self.input_dims,
+                                                           name=str(self.seed) + '_q_eval',
+                                                           chkpt_dir=self.chkpt_dir)
             self.q_next = deep_q_network_2x32.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_next',
-                                              chkpt_dir=self.chkpt_dir)
+                                                           input_dims=self.input_dims,
+                                                           name=str(self.seed) + '_q_next',
+                                                           chkpt_dir=self.chkpt_dir)
         elif network=="1LINEAR":
             self.q_eval = deep_q_network_1linear.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_eval',
-                                              chkpt_dir=self.chkpt_dir)
+                                                              input_dims=self.input_dims,
+                                                              name=str(self.seed) + '_q_eval',
+                                                              chkpt_dir=self.chkpt_dir)
             self.q_next = deep_q_network_1linear.DeepQNetwork(self.lr, self.n_actions,
-                                              input_dims=self.input_dims,
-                                              name=str(self.seed) + '_q_next',
-                                              chkpt_dir=self.chkpt_dir)
+                                                              input_dims=self.input_dims,
+                                                              name=str(self.seed) + '_q_next',
+                                                              chkpt_dir=self.chkpt_dir)
         else:
             print("invalid dqn network parameter")
             exit(0)

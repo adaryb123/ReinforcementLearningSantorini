@@ -7,31 +7,36 @@ FIT VUT 2023
 from engine.Board import encode_board
 import numpy as np
 import torch as T
-from deep_q_network_2x8 import DeepQNetwork
+from train.deep_q_network_2x8 import DeepQNetwork
 import os
 
 
 class RLBot:
-    def __init__(self, color, input_dims, n_actions, seed, checkpoint_frequency):
+    def __init__(self, color, seed, input_dims=(3,5,5), n_actions=128, checkpoint_frequency=1000, lr=0.0001):
         self.color = color
         self.chkpt_dir = 'models/'
         self.seed = seed
         self.counter = 0
         self.checkpoint_frequency = checkpoint_frequency
-        lr = 0.0001
         self.q_eval = DeepQNetwork(lr, n_actions,
                                           input_dims=input_dims,
-                                          name=str(self.seed) + 'secondary_q_eval',
+                                          name=str(self.seed) + '_secondary_q_eval',
                                           chkpt_dir=self.chkpt_dir)
+
+    def check_model_file_exists(self):
+        filename = "train/models/" + self.seed + "_q_eval"
+        return os.path.exists(filename)
 
     def reload_network(self):
         filename = self.chkpt_dir + self.seed + "_q_eval"
         if os.path.exists(filename):
             self.q_eval.load_checkpoint(self.chkpt_dir + self.seed + "_q_eval")
+
     def flip_tensor_values(self, states):
         states[:, 1, :, :] *= -1
         return states
-    def make_turn(self, board):
+
+    def make_turn(self, board, _):
 
         if self.counter % self.checkpoint_frequency == 0:
             self.reload_network()

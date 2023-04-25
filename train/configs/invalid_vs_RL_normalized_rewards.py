@@ -1,10 +1,10 @@
 config = {
-    'model_name': 'invalid_vs_RL_softmax_competitive',
-    'mode': 'competitive',
-    'load': True,
-    'model_to_load': 'invalid_vs_RL_softmax_competitive',
-    'n_episodes': 200000,
-    'epsilon': 0.7,
+    'model_name': 'invalid_vs_RL_normalized_rewards',
+    'mode': 'normalized',
+    'load': False,
+    'model_to_load': 'xxx',
+    'n_episodes': 500000,
+    'epsilon': 1,
     'eps_min': 0.01,
     'checkpoint_every': 1000,
     'learn_frequency': 100,
@@ -19,5 +19,5 @@ config = {
     'opponent': "RL",
     'network': "2X8", # 2X8, 4X8, 2X32, 1LINEAR
     'canals': 3,  # 2
-    'epsilon_softmax' : True   # true if the epsilon moves should be based on probability
+    'epsilon_softmax' : False   # true if the epsilon moves should be based on probability
 }

@@ -37,11 +37,11 @@ def main():
     env = Environment(mode, seed, opponent, checkpoint_every, canals)
     env.reset()
     agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
-                            input_dims=env.observation_space.shape,
-                            n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
-                            batch_size=batch_size, replace=replace, eps_dec=eps_dec,
-                            learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                            invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
+                     input_dims=env.observation_space.shape,
+                     n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
+                     batch_size=batch_size, replace=replace, eps_dec=eps_dec,
+                     learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
+                     invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
 
     agent.load_models(seed)
 

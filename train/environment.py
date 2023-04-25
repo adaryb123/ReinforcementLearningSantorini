@@ -32,6 +32,11 @@ class Environment(Env):
         self.reward_for_lose = -10
         self.reward_for_win = 10
 
+        if self.mode == "normalized":
+            self.reward_for_invalid_move = -1
+            self.reward_for_win = 1
+            self.reward_for_valid_move = 0
+
         self.primary_player_color = "white"
         self.secondary_player_color = "black"
         self.bot_name = bot_name
@@ -44,8 +49,8 @@ class Environment(Env):
         elif self.bot_name == "MINMAX":
             self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
-            self.secondary_player = RLBot(self.secondary_player_color, self.observation_space.shape,
-                                          self.action_space.n, self.seed, self.checkpoint_frequency)
+            self.secondary_player = RLBot(self.secondary_player_color, self.seed, self.observation_space.shape,
+                                          self.action_space.n, self.checkpoint_frequency)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 
@@ -118,6 +123,8 @@ class Environment(Env):
             return self.board.get_player_height(self.primary_player_color)
         elif self.mode == "single_lookback":
             return self.get_player_height_change(self.board, self.last_board, self.primary_player_color)
+        elif self.mode == "normalized":
+            return 0
 
     def reset(self):
         """ Reset board to default states"""
