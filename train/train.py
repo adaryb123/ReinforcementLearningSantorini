@@ -11,7 +11,7 @@ import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_RL_softmax_adamw as conf
+from configs import invalid_vs_RL_softmax_dropout as conf
 
 
 C = conf.config
@@ -36,6 +36,7 @@ network = C.get('network')
 canals = C.get('canals')
 epsilon_softmax = C.get('epsilon_softmax')
 adamw_optimizer = C.get('adamw_optimizer')
+dropout = C.get('dropout')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
@@ -75,7 +76,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = Environment(mode, seed, opponent, 1000000, canals, adamw_optimizer)
+        env = Environment(mode, seed, opponent, 1000000, canals, adamw_optimizer, dropout)
         env.reset()
         best_score = -np.inf
 
@@ -85,7 +86,7 @@ def main():
                          batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                          learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
                          invalid_moves_enabled=invalid_moves_enabled, network=network,
-                         epsilon_softmax=epsilon_softmax, adamw_optimizer=adamw_optimizer)
+                         epsilon_softmax=epsilon_softmax, adamw_optimizer=adamw_optimizer, dropout=dropout)
 
         figure_file = 'plots/' + str(seed) + "/"
 

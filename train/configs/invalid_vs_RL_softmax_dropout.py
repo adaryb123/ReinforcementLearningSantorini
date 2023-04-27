@@ -1,5 +1,5 @@
 config = {
-    'model_name': 'invalid_vs_RL_softmax_adamw',
+    'model_name': 'invalid_vs_RL_softmax_dropout',
     'mode': 'single',
     'load': False,
     'model_to_load': 'xxx',
@@ -20,5 +20,6 @@ config = {
     'network': "2X8", # 2X8, 4X8, 2X32, 1LINEAR
     'canals': 3,  # 2
     'epsilon_softmax': True,   # true if the epsilon moves should be based on probability
-    'adamw_optimizer': True
+    'adamw_optimizer': False,
+    'dropout': True
 }

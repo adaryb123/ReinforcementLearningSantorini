@@ -19,5 +19,7 @@ config = {
     'opponent': 'NONE', # NONE, RANDOM, MINMAX OR RL
     'network': '2X8', # 2X8, 4X8, 2X32, 1LINEAR
     'canals': 3,  # 2
-    'epsilon_softmax' : False   # true if the epsilon moves should be based on probability
+    'epsilon_softmax' : False,   # true if the epsilon moves should be based on probability
+    'adamw_optimizer': False,
+    'dropout': False
 }

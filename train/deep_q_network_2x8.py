@@ -13,7 +13,7 @@ import torch.optim as optim
 import numpy as np
 
 class DeepQNetwork(nn.Module):
-    def __init__(self, lr, n_actions, name, input_dims, chkpt_dir, adamw_optimizer):
+    def __init__(self, lr, n_actions, name, input_dims, chkpt_dir, adamw_optimizer=False, dropout=False):
         super(DeepQNetwork, self).__init__()
 
         self.checkpoint_dir = chkpt_dir
@@ -33,6 +33,8 @@ class DeepQNetwork(nn.Module):
             self.optimizer = optim.AdamW(self.parameters(), lr=lr)
         else:
             self.optimizer = optim.Adam(self.parameters(), lr=lr)
+        self.dropout = dropout
+
         self.loss = nn.MSELoss()
         self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
         self.to(self.device)
@@ -47,11 +49,19 @@ class DeepQNetwork(nn.Module):
         return int(np.prod(dims.size()))
 
     def forward(self, state):
-        conv1 = F.relu(self.conv1(state))
-        conv2 = F.relu(self.conv2(conv1))
-        conv_state = conv2.view(conv2.size()[0], -1)
-        flat1 = F.relu(self.fc1(conv_state))
-        flat2 = F.relu(self.fc2(flat1))
+
+        if self.dropout:
+            conv1 = F.dropout(F.relu(self.conv1(state)))
+            conv2 = F.dropout(F.relu(self.conv2(conv1)))
+            conv_state = conv2.view(conv2.size()[0], -1)
+            flat1 = F.dropout(F.relu(self.fc1(conv_state)))
+            flat2 = F.dropout(F.relu(self.fc2(flat1)))
+        else:
+            conv1 = F.relu(self.conv1(state))
+            conv2 = F.relu(self.conv2(conv1))
+            conv_state = conv2.view(conv2.size()[0], -1)
+            flat1 = F.relu(self.fc1(conv_state))
+            flat2 = F.relu(self.fc2(flat1))
 
         V = self.V(flat2)
         A = self.A(flat2)

@@ -19,7 +19,7 @@ class DQNAgent(object):
                  mem_size, batch_size, eps_min, eps_dec,
                  replace, learn_amount, seed=None, checkpoint_dir=None,
                  invalid_moves_enabled=False, network="2X8",
-                 epsilon_softmax=False, adamw_optimizer=False):
+                 epsilon_softmax=False, adamw_optimizer=False, dropout=False):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -44,11 +44,15 @@ class DQNAgent(object):
             self.q_eval = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
                                                           name=str(self.seed) + '_q_eval',
-                                                          chkpt_dir=self.chkpt_dir, adamw_optimizer=self.adamw_optimizer)
+                                                          chkpt_dir=self.chkpt_dir,
+                                                          adamw_optimizer=self.adamw_optimizer,
+                                                          dropout=dropout)
             self.q_next = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
                                                           name=str(self.seed) + '_q_next',
-                                                          chkpt_dir=self.chkpt_dir, adamw_optimizer=self.adamw_optimizer)
+                                                          chkpt_dir=self.chkpt_dir,
+                                                          adamw_optimizer=self.adamw_optimizer,
+                                                          dropout=dropout)
         elif network=="4X8":
             self.q_eval = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
