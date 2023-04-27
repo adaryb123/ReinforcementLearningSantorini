@@ -13,7 +13,7 @@ import torch.optim as optim
 import numpy as np
 
 class DeepQNetwork(nn.Module):
-    def __init__(self, lr, n_actions, name, input_dims, chkpt_dir):
+    def __init__(self, lr, n_actions, name, input_dims, chkpt_dir, adamw_optimizer):
         super(DeepQNetwork, self).__init__()
 
         self.checkpoint_dir = chkpt_dir
@@ -29,7 +29,10 @@ class DeepQNetwork(nn.Module):
         self.V = nn.Linear(200, 1)
         self.A = nn.Linear(200, n_actions)
 
-        self.optimizer = optim.Adam(self.parameters(), lr=lr)
+        if adamw_optimizer:
+            self.optimizer = optim.AdamW(self.parameters(), lr=lr)
+        else:
+            self.optimizer = optim.Adam(self.parameters(), lr=lr)
         self.loss = nn.MSELoss()
         self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
         self.to(self.device)
@@ -60,4 +63,4 @@ class DeepQNetwork(nn.Module):
 
     def load_checkpoint(self, checkpoint_file):
         self.load_state_dict(T.load(checkpoint_file, map_location=self.device))
-        # print(checkpoint_file + " loaded")
+        print(checkpoint_file + " loaded")

@@ -28,13 +28,13 @@ def get_input_for_player(color):
         elif number == 4:
             blackPlayer = MinMaxBot(color)
         elif number == 5:
-            seed = input("Type RL mode name. Make sure the model is stored in train/models:")
-            blackPlayer = RLBot(color,seed)
+            seed = input("Type RL mode name. Make sure the model is stored in train/models:\n")
+            blackPlayer = RLBot(color,seed,chkpt_dir='train/models/')
             if not blackPlayer.check_model_file_exists():
-                print("ERROR: model doesnt exist")
+                print("ERROR: model doesnt exist\n")
                 return get_input_for_player(color)
         else:
-            print("ERROR: invalid option")
+            print("ERROR: invalid option\n")
             return get_input_for_player(color)
         return blackPlayer
 
@@ -50,18 +50,18 @@ def get_input_for_player(color):
         elif number == 4:
             whitePlayer = MinMaxBot(color)
         elif number == 5:
-            seed = input("Type RL mode name. Make sure the model is stored in train/models:")
-            whitePlayer = RLBot(color,seed)
+            seed = input("Type RL mode name. Make sure the model is stored in train/models:\n")
+            whitePlayer = RLBot(color,seed,chkpt_dir='train/models/')
             if not whitePlayer.check_model_file_exists():
-                print("ERROR: model doesnt exist")
+                print("ERROR: model doesnt exist\n")
                 return get_input_for_player(color)
         else:
-            print("ERROR: invalid option")
+            print("ERROR: invalid option\n")
             return get_input_for_player(color)
         return whitePlayer
 
     else:
-        print("ERROR: invalid player color")
+        print("ERROR: invalid player color\n")
         exit(0)
 
 
@@ -79,12 +79,12 @@ def get_input_for_move(board, color):
         move = Move(fromCoords,toCoords,buildCoords,color)
         valid, msg = board.check_player_input_move_valid(move)
         if not valid:
-            print("ERROR: illegal move: " + msg)
+            print("ERROR: illegal move: " + msg + "\n0")
             return get_input_for_move(board,color)
         else:
             return move
     else:
-        print("ERROR: invalid input format")
+        print("ERROR: invalid input format\n")
         return get_input_for_move(board,color)
 
 

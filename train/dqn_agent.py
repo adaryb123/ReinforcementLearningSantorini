@@ -18,7 +18,8 @@ class DQNAgent(object):
     def __init__(self, gamma, epsilon, lr, n_actions, input_dims,
                  mem_size, batch_size, eps_min, eps_dec,
                  replace, learn_amount, seed=None, checkpoint_dir=None,
-                 invalid_moves_enabled=False, network="2X8", epsilon_softmax=False):
+                 invalid_moves_enabled=False, network="2X8",
+                 epsilon_softmax=False, adamw_optimizer=False):
         self.gamma = gamma
         self.epsilon = epsilon
         self.lr = lr
@@ -35,6 +36,7 @@ class DQNAgent(object):
         self.learn_step_counter = 0
         self.invalid_moves_enabled = invalid_moves_enabled
         self.epsilon_softmax = epsilon_softmax
+        self.adamw_optimizer = adamw_optimizer
 
         self.memory = ReplayMemory(mem_size, input_dims, n_actions)
 
@@ -42,11 +44,11 @@ class DQNAgent(object):
             self.q_eval = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
                                                           name=str(self.seed) + '_q_eval',
-                                                          chkpt_dir=self.chkpt_dir)
+                                                          chkpt_dir=self.chkpt_dir, adamw_optimizer=self.adamw_optimizer)
             self.q_next = deep_q_network_2x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
                                                           name=str(self.seed) + '_q_next',
-                                                          chkpt_dir=self.chkpt_dir)
+                                                          chkpt_dir=self.chkpt_dir, adamw_optimizer=self.adamw_optimizer)
         elif network=="4X8":
             self.q_eval = deep_q_network_4x8.DeepQNetwork(self.lr, self.n_actions,
                                                           input_dims=self.input_dims,
@@ -214,5 +216,5 @@ class DQNAgent(object):
     def load_models(self, old_seed):
         self.q_eval.load_checkpoint(self.chkpt_dir + old_seed + "_q_eval")
         self.q_next.load_checkpoint(self.chkpt_dir + old_seed + "_q_next")
-        print(self.chkpt_dir + old_seed + "_q_eval + loaded")
-        print(self.chkpt_dir + old_seed + "_q_next + loaded")
+        # print(self.chkpt_dir + old_seed + "_q_eval + loaded")
+        # print(self.chkpt_dir + old_seed + "_q_next + loaded")

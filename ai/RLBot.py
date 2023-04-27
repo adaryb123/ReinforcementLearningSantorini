@@ -10,14 +10,14 @@ import torch as T
 import os
 try:
     from deep_q_network_2x8 import DeepQNetwork
-except:
+except ImportError:
     from train.deep_q_network_2x8 import DeepQNetwork
 
 
 class RLBot:
-    def __init__(self, color, seed, input_dims=(3,5,5), n_actions=128, checkpoint_frequency=1000, lr=0.0001):
+    def __init__(self, color, seed, input_dims=(3,5,5), n_actions=128, checkpoint_frequency=1000, lr=0.0001, chkpt_dir='../train/models/', adamw_optimizer=False):
         self.color = color
-        self.chkpt_dir = '../train/models/'
+        self.chkpt_dir = chkpt_dir
         self.seed = seed
         self.counter = 0
         self.checkpoint_frequency = checkpoint_frequency
@@ -25,10 +25,10 @@ class RLBot:
         self.q_eval = DeepQNetwork(lr, n_actions,
                                           input_dims=input_dims,
                                           name=str(self.seed) + '_secondary_q_eval',
-                                          chkpt_dir=self.chkpt_dir)
+                                          chkpt_dir=self.chkpt_dir, adamw_optimizer=adamw_optimizer)
 
     def check_model_file_exists(self):
-        filename = "train/models/" + self.seed + "_q_eval"
+        filename = self.chkpt_dir + self.seed + "_q_eval"
         return os.path.exists(filename)
 
     def reload_network(self):

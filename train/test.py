@@ -6,7 +6,7 @@ FIT VUT 2023
 
 from dqn_agent import DQNAgent
 from environment import Environment
-from configs import invalid_vs_none_then_minmax as conf
+from configs import aaa as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')

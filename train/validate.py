@@ -6,7 +6,7 @@ FIT VUT 2023
 
 from dqn_agent import DQNAgent
 from environment import Environment
-from configs import invalid_vs_RL_softmax_competitive as conf
+from configs import invalid_vs_RL_softmax as conf
 import random
 import os
 
@@ -39,7 +39,6 @@ def log_move(info, logfile, env):
 
 def main():
 
-    for i in range(10):
         env = Environment(mode, seed, 'NONE', checkpoint_every, canals)
 
         agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
@@ -52,7 +51,8 @@ def main():
 
         agent.load_models(seed)
 
-        opponents = ['NONE','RANDOM','HEURISTIC','HEURISTIC-COMPETITIVE','MINMAX','RL']
+        # opponents = ['NONE','RANDOM','HEURISTIC','HEURISTIC-COMPETITIVE','MINMAX','RL']
+        opponents = ['RL']
 
         log_dir = "logs/" + str(seed)
         if not os.path.exists(log_dir):
@@ -62,11 +62,6 @@ def main():
 
             opponent = opponents[i]
             env.set_secondary_player(opponent)
-            # logfile = opponents[i]
-            # print(env.opponent)
-            # env.reset()
-            # print("start: " + " seed: " + str(seed) + " timestamp: " + " mode: " + str(mode) + "\n")
-            # print(env.render())
 
             reward_for_win = env.reward_for_win
             wins = 0

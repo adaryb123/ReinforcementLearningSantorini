@@ -6,12 +6,12 @@ FIT VUT 2023
 
 import numpy as np
 from dqn_agent import DQNAgent
-5from environment import Environment
+from environment import Environment
 import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_RL_softmax_continue_vs_not_replacing_RL as conf
+from configs import invalid_vs_RL_softmax_adamw as conf
 
 
 C = conf.config
@@ -35,6 +35,7 @@ opponent = C.get('opponent')
 network = C.get('network')
 canals = C.get('canals')
 epsilon_softmax = C.get('epsilon_softmax')
+adamw_optimizer = C.get('adamw_optimizer')
 old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
@@ -74,7 +75,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = Environment(mode, seed, opponent, 1000000, canals)
+        env = Environment(mode, seed, opponent, 1000000, canals, adamw_optimizer)
         env.reset()
         best_score = -np.inf
 
@@ -83,7 +84,8 @@ def main():
                          n_actions=env.action_space.n, mem_size=mem_size, eps_min=eps_min,
                          batch_size=batch_size, replace=replace, eps_dec=eps_dec,
                          learn_amount=learn_amount, seed=seed, checkpoint_dir='models/',
-                         invalid_moves_enabled=invalid_moves_enabled, network=network, epsilon_softmax=epsilon_softmax)
+                         invalid_moves_enabled=invalid_moves_enabled, network=network,
+                         epsilon_softmax=epsilon_softmax, adamw_optimizer=adamw_optimizer)
 
         figure_file = 'plots/' + str(seed) + "/"
 

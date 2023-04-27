@@ -17,7 +17,7 @@ import copy
 
 class Environment(Env):
 
-    def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals):
+    def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals, adamw_optimizer):
         super(Environment, self).__init__()
         self.action_space = spaces.Discrete(128)
         self.observation_space = spaces.Box(low=-1, high=5, shape=(canals, 5, 5), dtype=int)
@@ -44,13 +44,15 @@ class Environment(Env):
         self.secondary_player = "NONE"
         self.seed = seed
         self.checkpoint_frequency = checkpoint_frequency
+        self.adamw_optimizer = adamw_optimizer
+
         if self.bot_name == "RANDOM":
             self.secondary_player = RandomBot(self.secondary_player_color)
         elif self.bot_name == "MINMAX":
             self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
             self.secondary_player = RLBot(self.secondary_player_color, self.seed, self.observation_space.shape,
-                                          self.action_space.n, self.checkpoint_frequency)
+                                          self.action_space.n, self.checkpoint_frequency, self.adamw_optimizer)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 
@@ -64,8 +66,8 @@ class Environment(Env):
         elif self.bot_name == "MINMAX":
             self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
-            self.secondary_player = RLBot(self.secondary_player_color, self.observation_space.shape,
-                                          self.action_space.n, self.seed, self.checkpoint_frequency)
+            self.secondary_player = RLBot(self.secondary_player_color, self.seed, self.observation_space.shape,
+                                          self.action_space.n, self.checkpoint_frequency)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 
