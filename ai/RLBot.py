@@ -1,5 +1,5 @@
 """
-Version of agent only for testing and validation
+Version of RL agent for casual play, or as an opponent while evaluating the main model
 Author: Adam Rybansky (xryban00)
 FIT VUT 2023
 """
@@ -24,7 +24,7 @@ class RLBot:
         self.counter = 0
         self.checkpoint_frequency = checkpoint_frequency
 
-        self.q_eval = DeepQNetwork(lr, n_actions,
+        self.q_eval = DeepQNetwork(lr=lr, n_actions = n_actions,
                                           input_dims=input_dims,
                                           name=str(self.seed) + '_secondary_q_eval',
                                           chkpt_dir=self.chkpt_dir, adamw_optimizer=adamw_optimizer, dropout=dropout)

@@ -6,9 +6,10 @@ FIT VUT 2023
 
 from dqn_agent import DQNAgent
 from environment import Environment
-from configs import invalid_vs_RL_softmax as conf
 import random
 import os
+
+from configs import model1 as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -29,7 +30,12 @@ invalid_moves_enabled = C.get('invalid_moves_enabled')
 network = C.get('network')
 canals = C.get('canals')
 epsilon_softmax = C.get('epsilon_softmax')
+adamw_optimizer = C.get('adamw_optimizer')
+dropout = C.get('dropout')
+epsilon_softmax = C.get('epsilon_softmax')
 seed = C.get('model_name')
+
+invalid_moves_enabled = False
 
 def log_move(info, logfile, env):
     action_log = "------------player: " + info.get("player") + " move: " + info.get(
@@ -39,7 +45,7 @@ def log_move(info, logfile, env):
 
 def main():
 
-        env = Environment(mode, seed, 'NONE', checkpoint_every, canals)
+        env = Environment(mode, seed, 'NONE', checkpoint_every, canals, lr, adamw_optimizer, dropout)
 
         agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
                          input_dims=env.observation_space.shape,
@@ -51,8 +57,7 @@ def main():
 
         agent.load_models(seed)
 
-        # opponents = ['NONE','RANDOM','HEURISTIC','HEURISTIC-COMPETITIVE','MINMAX','RL']
-        opponents = ['RL']
+        opponents = ['NONE','RANDOM','HEURISTIC','HEURISTIC-COMPETITIVE','MINMAX','RL']
 
         log_dir = "logs/" + str(seed)
         if not os.path.exists(log_dir):

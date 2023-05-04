@@ -11,7 +11,7 @@ import random
 from datetime import datetime
 from utils import *
 
-from configs import invalid_vs_RL_softmax_dropout as conf
+from configs import model2 as conf
 
 
 C = conf.config
@@ -41,7 +41,7 @@ old_seed = ""
 if load == True:
     old_seed = C.get('model_to_load')
 
-
+seed = random.randint(10000, 99999)
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
         types[0] += 1
@@ -76,7 +76,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = Environment(mode, seed, opponent, 1000000, canals, adamw_optimizer, dropout)
+        env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout)
         env.reset()
         best_score = -np.inf
 
@@ -100,8 +100,9 @@ def main():
         ps = PlotItemStorage()
         previous_train_offset = 0
         if load:
-            ps = ps_load(old_seed)
-            previous_train_offset = ps.episodes_num_array[-1]
+            if ps_load_possible(old_seed):
+                ps = ps_load(old_seed)
+                previous_train_offset = ps.episodes_num_array[-1]
 
         invalid_move_types = [0, 0, 0, 0, 0, 0, 0]
         last_message = ""

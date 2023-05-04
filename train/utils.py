@@ -35,12 +35,12 @@ def ps_store(plot_object, seed):
     with open(filename, "wb") as pickle_out:
         pickle.dump(plot_object, pickle_out)
 
+def ps_load_possible(seed):
+    filename = "plots/" + str(seed) + "/values.pickle"
+    return os.path.exists(filename)
+
 def ps_load(seed):
     filename = "plots/" + str(seed) + "/values.pickle"
-    if not os.path.exists(filename):
-        print("ERROR: no plot values to load")
-        exit(0)
-
     with open(filename, "rb") as pickle_in:
         return pickle.load(pickle_in)
 

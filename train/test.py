@@ -6,7 +6,9 @@ FIT VUT 2023
 
 from dqn_agent import DQNAgent
 from environment import Environment
-from configs import aaa as conf
+
+
+from configs import model2 as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -27,14 +29,14 @@ opponent = C.get('opponent')
 network = C.get('network')
 canals = C.get('canals')
 epsilon_softmax = C.get('epsilon_softmax')
+adamw_optimizer = C.get('adamw_optimizer')
+dropout = C.get('dropout')
 seed = C.get('model_name')
-# seed = "61603"
-# seed = "test-only-valid-moves"
 
 invalid_moves_enabled = False
 
 def main():
-    env = Environment(mode, seed, opponent, checkpoint_every, canals)
+    env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout)
     env.reset()
     agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
                      input_dims=env.observation_space.shape,

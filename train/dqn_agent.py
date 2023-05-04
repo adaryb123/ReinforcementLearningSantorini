@@ -220,5 +220,5 @@ class DQNAgent(object):
     def load_models(self, old_seed):
         self.q_eval.load_checkpoint(self.chkpt_dir + old_seed + "_q_eval")
         self.q_next.load_checkpoint(self.chkpt_dir + old_seed + "_q_next")
-        # print(self.chkpt_dir + old_seed + "_q_eval + loaded")
-        # print(self.chkpt_dir + old_seed + "_q_next + loaded")
+        print(self.chkpt_dir + old_seed + "_q_eval loaded")
+        print(self.chkpt_dir + old_seed + "_q_next loaded")
