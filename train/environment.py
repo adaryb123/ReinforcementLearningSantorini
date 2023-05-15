@@ -17,7 +17,7 @@ import copy
 
 class Environment(Env):
 
-    def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals, learning_rate, adamw_optimizer, dropout):
+    def __init__(self, mode, seed, bot_name, checkpoint_frequency, canals, learning_rate, adamw_optimizer, dropout, former_seed):
         super(Environment, self).__init__()
         self.action_space = spaces.Discrete(128)
         self.observation_space = spaces.Box(low=-1, high=5, shape=(canals, 5, 5), dtype=int)
@@ -46,7 +46,8 @@ class Environment(Env):
         self.checkpoint_frequency = checkpoint_frequency
         self.learning_rate = learning_rate
         self.adamw_optimizer = adamw_optimizer
-        self.dropout  = dropout
+        self.dropout = dropout
+        self.former_seed = former_seed
 
         if self.bot_name == "RANDOM":
             self.secondary_player = RandomBot(self.secondary_player_color)
@@ -54,7 +55,8 @@ class Environment(Env):
             self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
             self.secondary_player = RLBot(self.secondary_player_color, self.seed, self.observation_space.shape,
-                                          self.action_space.n, self.checkpoint_frequency, self.learning_rate, self.adamw_optimizer, self.dropout)
+                                          self.action_space.n, self.checkpoint_frequency, self.learning_rate,
+                                          self.adamw_optimizer, self.dropout, former_seed=self.former_seed)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 
@@ -69,7 +71,8 @@ class Environment(Env):
             self.secondary_player = MinMaxBot(self.secondary_player_color)
         elif self.bot_name == "RL":
             self.secondary_player = RLBot(self.secondary_player_color, self.seed, self.observation_space.shape,
-                                          self.action_space.n, self.checkpoint_frequency, self.learning_rate, self.adamw_optimizer, self.dropout)
+                                          self.action_space.n, self.checkpoint_frequency, self.learning_rate,
+                                          self.adamw_optimizer, self.dropout, former_seed=self.former_seed)
         elif self.bot_name == "HEURISTIC":
             self.secondary_player = HeuristicBot(self.secondary_player_color)
 

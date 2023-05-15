@@ -11,7 +11,7 @@ import random
 from datetime import datetime
 from utils import *
 
-from configs import model2 as conf
+from configs import example_config as conf
 
 
 C = conf.config
@@ -37,11 +37,11 @@ canals = C.get('canals')
 epsilon_softmax = C.get('epsilon_softmax')
 adamw_optimizer = C.get('adamw_optimizer')
 dropout = C.get('dropout')
-old_seed = ""
+old_seed = None
 if load == True:
     old_seed = C.get('model_to_load')
 
-seed = random.randint(10000, 99999)
+# seed = str(random.randint(10000, 99999))
 def update_invalid_move_types(message, types):
     if message == "moved more than 1 level higher":
         types[0] += 1
@@ -76,7 +76,7 @@ def main():
     setup_output_files_directories(seed)
     logfile_name = "logs/" + str(seed) + "_train"
     with open(logfile_name, 'w') as logfile:
-        env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout)
+        env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout, old_seed)
         env.reset()
         best_score = -np.inf
 

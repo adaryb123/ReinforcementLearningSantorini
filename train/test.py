@@ -32,11 +32,12 @@ epsilon_softmax = C.get('epsilon_softmax')
 adamw_optimizer = C.get('adamw_optimizer')
 dropout = C.get('dropout')
 seed = C.get('model_name')
+old_seed = None
 
 invalid_moves_enabled = False
 
 def main():
-    env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout)
+    env = Environment(mode, seed, opponent, checkpoint_every, canals, lr, adamw_optimizer, dropout, old_seed)
     env.reset()
     agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
                      input_dims=env.observation_space.shape,

@@ -17,7 +17,7 @@ except ImportError:
 class RLBot:
     def __init__(self, color, seed,
                  input_dims=(3,5,5), n_actions=128, checkpoint_frequency=1000, lr=0.0001,
-                 adamw_optimizer=False, dropout=False, chkpt_dir='../train/models/'):
+                 adamw_optimizer=False, dropout=False, chkpt_dir='../train/models/', former_seed=None):
         self.color = color
         self.chkpt_dir = chkpt_dir
         self.seed = seed
@@ -28,6 +28,12 @@ class RLBot:
                                           input_dims=input_dims,
                                           name=str(self.seed) + '_secondary_q_eval',
                                           chkpt_dir=self.chkpt_dir, adamw_optimizer=adamw_optimizer, dropout=dropout)
+
+        if former_seed is not None:
+            filename = self.chkpt_dir + former_seed + "_q_eval"
+            if os.path.exists(filename):
+                self.q_eval.load_checkpoint(filename)
+
 
     def check_model_file_exists(self):
         filename = self.chkpt_dir + self.seed + "_q_eval"

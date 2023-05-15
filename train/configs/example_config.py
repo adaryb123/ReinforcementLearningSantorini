@@ -2,7 +2,7 @@ config = {
     'model_name': 'example_config',
     'mode': 'single',   # single, competitive, cooperative, single_lookback
     'load': False,      # true if loading a previously trained model
-    'model_to_load': 'xxx',
+    'model_to_load': None,
     'n_episodes': 200000,
     'epsilon': 1,
     'eps_min': 0.01,

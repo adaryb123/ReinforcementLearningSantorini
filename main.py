@@ -51,7 +51,7 @@ def get_input_for_player(color):
             whitePlayer = MinMaxBot(color)
         elif number == 5:
             seed = input("Type RL mode name. Make sure the model is stored in train/models:\n")
-            whitePlayer = RLBot(color,seed,chkpt_dir='train/models/')
+            whitePlayer = RLBot(color,seed, chkpt_dir='train/models/')
             if not whitePlayer.check_model_file_exists():
                 print("ERROR: model doesnt exist\n")
                 return get_input_for_player(color)

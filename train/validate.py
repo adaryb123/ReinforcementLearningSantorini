@@ -9,7 +9,7 @@ from environment import Environment
 import random
 import os
 
-from configs import model1 as conf
+from configs import model2 as conf
 
 C = conf.config
 n_episodes = C.get('n_episodes')
@@ -34,6 +34,7 @@ adamw_optimizer = C.get('adamw_optimizer')
 dropout = C.get('dropout')
 epsilon_softmax = C.get('epsilon_softmax')
 seed = C.get('model_name')
+old_seed = None
 
 invalid_moves_enabled = False
 
@@ -45,7 +46,7 @@ def log_move(info, logfile, env):
 
 def main():
 
-        env = Environment(mode, seed, 'NONE', checkpoint_every, canals, lr, adamw_optimizer, dropout)
+        env = Environment(mode, seed, 'NONE', checkpoint_every, canals, lr, adamw_optimizer, dropout, old_seed)
 
         agent = DQNAgent(gamma=gamma, epsilon=0, lr=lr,
                          input_dims=env.observation_space.shape,

@@ -2,7 +2,7 @@ config = {
     'model_name': 'model2',
     'mode': 'single',
     'load': False,
-    'model_to_load': 'xxx',
+    'model_to_load': None,
     'n_episodes': 300000,
     'epsilon': 1,
     'eps_min': 0.01,
